@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mood Constellation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .subtitle {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    .button:hover {
+      transform: translateY(-2px);
+    }
+    .button:active {
+      transform: translateY(0);
+    }
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✨ Mood Constellation</h1>
+    <p class="subtitle">Track your moods, create beautiful constellations</p>
+    
+    <div class="success-message" id="successMessage">
+      Entry saved successfully!
+    </div>
+
+    <form id="moodForm">
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="mood">How are you feeling?</label>
+        <select id="mood" name="mood" required>
+          <option value="">Select a mood...</option>
+          <option value="glowing">✨ Glowing</option>
+          <option value="peaceful">🕊️ Peaceful</option>
+          <option value="hopeful">🌅 Hopeful</option>
+          <option value="anxious">⚡ Anxious</option>
+          <option value="tired">😴 Tired</option>
+          <option value="heavy">⛈️ Heavy</option>
+          <option value="confused">❓ Confused</option>
+          <option value="excited">🚀 Excited</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="energy">Energy Level (1-5)</label>
+        <input type="range" id="energy" name="energy" min="1" max="5" value="3">
+        <div style="text-align: center; color: #666; margin-top: 5px;">
+          <span id="energyValue">3</span> / 5
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="gratitude">What are you grateful for?</label>
+        <textarea id="gratitude" name="gratitude" placeholder="Something small is enough..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Additional notes</label>
+        <textarea id="notes" name="notes" placeholder="Write anything you'd like to remember..."></textarea>
+      </div>
+
+      <button type="submit" class="button">Save My Constellation ✨</button>
+    </form>
+  </div>
+
+  <script>
+    // Set today's date as default
+    document.getElementById('date').valueAsDate = new Date();
+
+    // Update energy level display
+    document.getElementById('energy').addEventListener('input', function() {
+      document.getElementById('energyValue').textContent = this.value;
+    });
+
+    // Handle form submission
+    document.getElementById('moodForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const entry = {
+        date: document.getElementById('date').value,
+        mood: document.getElementById('mood').value,
+        energy: document.getElementById('energy').value,
+        gratitude: document.getElementById('gratitude').value,
+        notes: document.getElementById('notes').value,
+        timestamp: new Date().toISOString()
+      };
+
+      // Save to localStorage
+      let entries = JSON.parse(localStorage.getItem('moodEntries') || '[]');
+      entries.unshift(entry);
+      localStorage.setItem('moodEntries', JSON.stringify(entries));
+
+      // Show success message
+      const successMsg = document.getElementById('successMessage');
+      successMsg.style.display = 'block';
+      setTimeout(() => {
+        successMsg.style.display = 'none';
+      }, 3000);
+
+      // Reset form
+      this.reset();
+      document.getElementById('date').valueAsDate = new Date();
+      document.getElementById('energy').value = 3;
+      document.getElementById('energyValue').textContent = 3;
+    });
+  </script>
+</body>
+</html>
