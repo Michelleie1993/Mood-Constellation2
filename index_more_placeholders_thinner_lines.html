@@ -1,0 +1,4396 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mood Constellation Diary</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&amp;family=Spectral:ital,wght@0,300;0,400;1,300;1,400&amp;display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --cream: #FAF7F0;
+  --cream2: #F5F1E8;
+  --cream3: #EDE8DC;
+  --cream4: #E4DDD0;
+  --ink: #1E1E1E;
+  --ink-soft: #3a3530;
+  --ink-faint: #8a8278;
+  --blush: #D4A5A5;
+  --blush-soft: #E8C9C9;
+  --gold: #C9A84C;
+  --gold-soft: #E8D5A0;
+  --lavender: #7A72A0;
+  --lavender-soft: #C9C4DE;
+  --sage: #6A8B6A;
+  --sage-soft: #B8D0B8;
+  --navy: #3A4A6B;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; min-height:100vh; overflow-x:hidden; }
+body { background:var(--cream); color:var(--ink); font-family:'Lora',serif; }
+
+/* NAV */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:var(--cream); border-bottom:1px solid var(--cream3);
+  padding:0 1.5rem; display:flex; align-items:center; justify-content:space-between; height:56px;
+}
+.nav-logo { font-family:'Spectral',serif; font-style:italic; font-size:1rem; color:var(--ink); }
+.nav-logo span { color:var(--gold); }
+.nav-links { display:flex; gap:1.5rem; }
+.nav-links button {
+  background:none; border:none; cursor:pointer; font-family:'Lora',serif;
+  font-size:0.82rem; color:var(--ink-faint); padding:0.4rem 0;
+  transition:color 0.2s; letter-spacing:0.04em;
+}
+.nav-links button:hover, .nav-links button.active { color:var(--ink); }
+.nav-links button.active { border-bottom:1px solid var(--ink); }
+
+
+.auth-pill {
+  border:1px solid var(--cream3); border-radius:999px; padding:0.38rem 0.75rem;
+  display:flex; align-items:center; gap:0.55rem; color:var(--ink-faint);
+  font-size:0.72rem; font-style:italic; max-width:230px;
+}
+.auth-pill strong { color:var(--ink); font-weight:400; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.auth-pill button {
+  background:none; border:none; color:var(--ink-faint); cursor:pointer;
+  font-family:'Lora',serif; font-size:0.72rem; text-decoration:underline;
+}
+#auth-screen {
+  position:fixed; inset:0; z-index:500; background:radial-gradient(circle at 50% 40%, var(--cream2), var(--cream));
+  display:none; align-items:center; justify-content:center; padding:1.5rem;
+}
+#auth-screen.show { display:flex; }
+.auth-card {
+  width:min(440px,100%); background:rgba(250,247,240,0.88); border:1px solid var(--cream3);
+  border-radius:22px; padding:2rem; text-align:center; box-shadow:0 24px 70px rgba(58,53,48,0.12);
+}
+.auth-stars { font-size:2rem; letter-spacing:0.25em; margin-bottom:0.8rem; animation:floatStars 3.8s ease-in-out infinite; }
+.auth-card h1 { font-family:'Spectral',serif; font-weight:300; font-style:italic; font-size:1.9rem; margin-bottom:0.5rem; }
+.auth-card p { color:var(--ink-faint); font-size:0.88rem; font-style:italic; line-height:1.7; margin-bottom:1.25rem; }
+.auth-card input {
+  width:100%; border:1px solid var(--cream3); border-radius:999px; background:var(--cream);
+  padding:0.85rem 1rem; font-family:'Lora',serif; color:var(--ink); outline:none; margin-bottom:0.85rem;
+}
+.auth-card input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+.auth-note { margin-top:0.9rem !important; font-size:0.72rem !important; }
+.secondary-auth-btn { background:transparent !important; color:var(--ink) !important; border:1px solid var(--cream4) !important; box-shadow:none !important; }
+.secondary-auth-btn:hover { border-color:var(--gold) !important; }
+@keyframes floatStars { 0%,100%{transform:translateY(0);opacity:.7} 50%{transform:translateY(-6px);opacity:1} }
+
+/* PAGES */
+.page { display:none; padding-top:72px; min-height:100vh; }
+.page.active { display:block; }
+
+/* FORM */
+.form-wrap { max-width:600px; margin:0 auto; padding:1.5rem 1.5rem 5rem; }
+.form-header { text-align:center; margin-bottom:2rem; }
+.form-date { font-family:'Spectral',serif; font-style:italic; font-size:0.85rem; color:var(--ink-faint); margin-bottom:0.4rem; }
+.form-title { font-family:'Spectral',serif; font-size:1.8rem; font-weight:300; }
+.form-subtitle { font-size:0.82rem; color:var(--ink-faint); font-style:italic; margin-top:0.3rem; }
+.doodle-stars { text-align:center; font-size:0.75rem; color:var(--blush); letter-spacing:0.4em; margin-bottom:0.5rem; }
+.space-blurb { text-align:center; font-family:'Spectral',serif; font-style:italic; font-size:0.88rem; color:var(--ink-faint); margin:1.5rem 0; line-height:1.7; }
+.q-block { margin-bottom:1.75rem; }
+.q-label { font-family:'Spectral',serif; font-size:0.98rem; color:var(--ink); margin-bottom:0.6rem; display:block; }
+.q-hint { font-size:0.78rem; color:var(--ink-faint); font-style:italic; margin-bottom:0.6rem; }
+
+/* mood chips */
+.mood-chips { display:flex; flex-wrap:wrap; gap:0.45rem; }
+.mood-chip {
+  background:none; border:1px solid var(--cream4); border-radius:20px;
+  padding:0.38rem 0.85rem; font-family:'Lora',serif; font-size:0.82rem;
+  color:var(--ink-soft); cursor:pointer; transition:all 0.18s;
+}
+.mood-chip:hover { border-color:var(--ink-faint); background:var(--cream2); }
+.mood-chip.selected { border-color:var(--ink); background:var(--ink); color:var(--cream); }
+
+/* energy */
+.energy-wrap { display:flex; align-items:center; gap:0.75rem; }
+input[type="range"] {
+  flex:1; -webkit-appearance:none; height:2px;
+  background:var(--cream4); border-radius:2px; outline:none; cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:15px; height:15px; border-radius:50%;
+  background:var(--ink); cursor:pointer;
+}
+.energy-val { font-family:'Spectral',serif; font-style:italic; font-size:1.1rem; min-width:1.25rem; text-align:center; }
+
+/* textarea */
+.q-textarea {
+  width:100%; border:none; border-bottom:1px solid var(--cream4);
+  background:transparent; font-family:'Lora',serif; font-size:0.92rem;
+  color:var(--ink); padding:0.45rem 0; outline:none; resize:none; min-height:40px;
+  transition:border-color 0.2s; line-height:1.6;
+}
+.q-textarea:focus { border-bottom-color:var(--ink); }
+.q-textarea::placeholder { color:var(--ink-faint); font-style:italic; }
+
+/* tags */
+.tag-chips { display:flex; flex-wrap:wrap; gap:0.35rem; }
+.tag-chip {
+  background:none; border:1px solid var(--cream4); border-radius:20px;
+  padding:0.28rem 0.7rem; font-family:'Lora',serif; font-size:0.78rem;
+  color:var(--ink-faint); cursor:pointer; transition:all 0.18s;
+}
+.tag-chip:hover { border-color:var(--lavender); color:var(--lavender); }
+.tag-chip.selected { border-color:var(--lavender); background:var(--lavender-soft); color:var(--navy); }
+
+/* submit */
+.submit-btn {
+  display:block; margin:2rem auto 0; background:var(--ink); color:var(--cream);
+  border:none; border-radius:30px; padding:0.8rem 2.25rem;
+  font-family:'Spectral',serif; font-style:italic; font-size:1rem;
+  cursor:pointer; letter-spacing:0.03em; transition:all 0.2s;
+}
+.submit-btn:hover { opacity:0.85; transform:translateY(-1px); }
+
+.fact-pill {
+  display:block; text-align:center; font-size:0.75rem; color:var(--ink-faint);
+  font-style:italic; margin-top:1.25rem; line-height:1.6;
+}
+.section-rule { border:none; border-top:1px solid var(--cream3); margin:1.5rem 0; }
+
+/* ═══ CONSTELLATION PREVIEW BOX ═══ */
+.constellation-preview-box {
+  width:100%; background:var(--cream2);
+  border:1px solid var(--cream3); border-radius:12px;
+  margin:1.5rem 0; overflow:hidden; position:relative;
+}
+.constellation-preview-box canvas {
+  display:block; width:100% !important; height:100% !important;
+}
+.preview-label {
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  font-family:'Spectral',serif; font-style:italic; font-size:0.72rem;
+  color:var(--ink-faint); pointer-events:none; white-space:nowrap;
+}
+.preview-placeholder {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:0.5rem; padding:3rem 1rem;
+  color:var(--ink-faint); font-style:italic; font-size:0.85rem;
+}
+.preview-placeholder .big-star { font-size:2rem; opacity:0.3; }
+
+/* GALAXY */
+#Galaxy-canvas-wrap {
+  position:relative; width:100%; height:calc(100vh - 56px); overflow:hidden;
+}
+.Galaxy-overlay {
+  position:absolute; top:0; left:0; right:0; padding:1.25rem 1.5rem; pointer-events:none;
+}
+.Galaxy-title { font-family:'Spectral',serif; font-style:italic; font-size:1.4rem; font-weight:300; }
+.Galaxy-subtitle { font-size:0.78rem; color:var(--ink-faint); font-style:italic; margin-top:0.2rem; }
+.Galaxy-hint {
+  position:absolute; bottom:1.25rem; left:50%; transform:translateX(-50%);
+  font-family:'Spectral',serif; font-style:italic; font-size:0.75rem;
+  color:var(--ink-faint); pointer-events:none; white-space:nowrap;
+}
+.entry-tooltip {
+  position:absolute; background:var(--cream); border:1px solid var(--cream3);
+  border-radius:8px; padding:0.65rem 0.9rem; font-size:0.78rem; color:var(--ink);
+  pointer-events:none; max-width:170px; display:none; z-index:10;
+}
+.entry-tooltip .tt-date { font-style:italic; color:var(--ink-faint); font-size:0.72rem; margin-bottom:0.2rem; }
+
+/* JOURNAL */
+.Journal-wrap { max-width:860px; margin:0 auto; padding:1.5rem 1.5rem 4rem; }
+.Journal-header { margin-bottom:1.75rem; }
+.Journal-title { font-family:'Spectral',serif; font-size:1.6rem; font-weight:300; font-style:italic; }
+.Journal-count { font-size:0.78rem; color:var(--ink-faint); margin-top:0.2rem; }
+.Journal-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; }
+.Journal-card {
+  appearance:none; -webkit-appearance:none; text-align:left; font:inherit; color:inherit;
+  background:var(--cream2); border:1px solid var(--cream3); border-radius:10px;
+  padding:1.1rem; cursor:pointer; transition:all 0.2s;
+}
+.Journal-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.05); border-color:var(--ink-faint); }
+.card-date { font-size:0.72rem; color:var(--ink-faint); font-style:italic; margin-bottom:0.4rem; }
+.card-mood { font-family:'Spectral',serif; font-size:1rem; font-style:italic; margin-bottom:0.65rem; }
+.card-mini-wrap { width:100%; height:100px; border-radius:6px; overflow:hidden; background:var(--cream3); margin-bottom:0.65rem; position:relative; }
+.card-mini-wrap canvas { display:block !important; pointer-events:none; }
+.card-snippet { font-size:0.78rem; color:var(--ink-faint); font-style:italic; line-height:1.5; }
+.card-tags { display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.6rem; }
+.card-tag { font-size:0.68rem; color:var(--lavender); border:1px solid var(--lavender-soft); border-radius:20px; padding:0.12rem 0.45rem; }
+.empty-Journal { text-align:center; padding:3rem 2rem; color:var(--ink-faint); font-style:italic; }
+
+
+.card-mini-wrap svg, #detail-canvas-wrap svg, #success-canvas-wrap svg { pointer-events:none; display:block; }
+.svg-reveal { animation: constellationReveal 700ms ease-out both; }
+@keyframes constellationReveal {
+  from { opacity:0; transform:scale(0.985); filter:blur(2px); }
+  to { opacity:1; transform:scale(1); filter:blur(0); }
+}
+
+/* DETAIL */
+.detail-wrap { max-width:640px; margin:0 auto; padding:1.5rem 1.5rem 4rem; }
+.detail-back {
+  background:none; border:none; cursor:pointer; font-family:'Lora',serif;
+  font-size:0.82rem; color:var(--ink-faint); padding:0; margin-bottom:1.25rem;
+  display:flex; align-items:center; gap:0.35rem; transition:color 0.2s;
+}
+.detail-back:hover { color:var(--ink); }
+.detail-date { font-size:0.82rem; color:var(--ink-faint); font-style:italic; margin-bottom:0.4rem; }
+.detail-mood-title { font-family:'Spectral',serif; font-size:1.8rem; font-weight:300; font-style:italic; margin-bottom:0.2rem; }
+#detail-canvas-wrap { width:100%; height:340px; border-radius:16px; overflow:hidden; background:linear-gradient(145deg,var(--cream2),var(--cream3)); margin:1.25rem 0; position:relative; box-shadow:inset 0 0 0 1px rgba(201,168,76,0.18), 0 18px 45px rgba(58,53,48,0.08); }
+#detail-canvas-wrap canvas { display:block !important; pointer-events:none; }
+.symbolic-legend { background:var(--cream2); border:1px solid var(--cream3); border-radius:10px; padding:1.1rem; margin-bottom:1.25rem; }
+.symbolic-legend h3 { font-family:'Spectral',serif; font-size:0.95rem; font-style:italic; font-weight:300; margin-bottom:0.65rem; }
+.sym-row { display:flex; gap:0.65rem; align-items:flex-start; margin-bottom:0.45rem; }
+.sym-icon { font-size:0.85rem; width:1.25rem; flex-shrink:0; }
+.sym-text { font-size:0.82rem; color:var(--ink-soft); font-style:italic; line-height:1.5; }
+.detail-section { margin-bottom:1.1rem; }
+.detail-q { font-size:0.72rem; color:var(--ink-faint); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.25rem; }
+.detail-a { font-size:0.9rem; color:var(--ink); font-style:italic; line-height:1.6; }
+.delete-btn {
+  background:none; border:1px solid var(--cream3); border-radius:20px;
+  padding:0.38rem 1rem; font-family:'Lora',serif; font-size:0.78rem;
+  color:var(--ink-faint); cursor:pointer; transition:all 0.2s; margin-top:1.5rem;
+}
+.delete-btn:hover { border-color:#cc6666; color:#cc6666; }
+
+/* ═══ AI INSIGHTS PAGE ═══ */
+.Insights-wrap { max-width:720px; margin:0 auto; padding:1.5rem 1.5rem 5rem; }
+.Insights-header { margin-bottom:1.75rem; }
+.Insights-title { font-family:'Spectral',serif; font-size:1.6rem; font-weight:300; font-style:italic; }
+.Insights-subtitle { font-size:0.8rem; color:var(--ink-faint); margin-top:0.25rem; font-style:italic; }
+
+.Insights-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:0.85rem; margin-bottom:1.75rem; }
+.stat-card {
+  background:var(--cream2); border:1px solid var(--cream3); border-radius:10px;
+  padding:1rem 1.1rem;
+}
+.stat-label { font-size:0.72rem; color:var(--ink-faint); letter-spacing:0.07em; text-transform:uppercase; margin-bottom:0.35rem; }
+.stat-val { font-family:'Spectral',serif; font-size:1.6rem; font-style:italic; color:var(--ink); }
+.stat-sub { font-size:0.72rem; color:var(--ink-faint); margin-top:0.15rem; font-style:italic; }
+
+.mood-bar-wrap { margin-bottom:0.5rem; }
+.mood-bar-label { display:flex; justify-content:space-between; font-size:0.78rem; color:var(--ink-soft); margin-bottom:0.3rem; font-style:italic; }
+.mood-bar-track { height:4px; background:var(--cream3); border-radius:4px; overflow:hidden; }
+.mood-bar-fill { height:100%; border-radius:4px; background:var(--ink); transition:width 0.6s ease; }
+
+.Insights-section { margin-bottom:2rem; }
+.Insights-section-title {
+  font-family:'Spectral',serif; font-style:italic; font-size:1.05rem; font-weight:300;
+  color:var(--ink); margin-bottom:0.9rem; padding-bottom:0.5rem;
+  border-bottom:1px solid var(--cream3);
+}
+
+/* AI response card */
+.ai-card {
+  background:var(--cream2); border:1px solid var(--cream3); border-radius:12px;
+  padding:1.25rem 1.4rem; position:relative;
+}
+.ai-card-label {
+  font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:0.75rem; display:flex; align-items:center; gap:0.4rem;
+}
+.ai-card-label::before { content:'✦'; font-size:0.7rem; }
+.ai-response {
+  font-family:'Spectral',serif; font-style:italic; font-size:0.95rem;
+  color:var(--ink-soft); line-height:1.8; white-space:pre-wrap;
+}
+.ai-response.loading { color:var(--ink-faint); }
+.ai-response.loading::after {
+  content:''; display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:var(--ink-faint); margin-left:6px;
+  animation:pulse 1s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+.generate-btn {
+  background:var(--ink); color:var(--cream); border:none; border-radius:30px;
+  padding:0.7rem 1.75rem; font-family:'Spectral',serif; font-style:italic;
+  font-size:0.92rem; cursor:pointer; transition:all 0.2s; margin-top:1rem;
+}
+.generate-btn:hover { opacity:0.85; transform:translateY(-1px); }
+.generate-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+.generate-btn-outline {
+  background:none; border:1px solid var(--cream4); border-radius:30px;
+  padding:0.55rem 1.25rem; font-family:'Spectral',serif; font-style:italic;
+  font-size:0.85rem; color:var(--ink-faint); cursor:pointer; transition:all 0.2s;
+  margin-top:0.75rem;
+}
+.generate-btn-outline:hover { border-color:var(--ink); color:var(--ink); }
+.generate-btn-outline:disabled { opacity:0.5; cursor:not-allowed; }
+
+
+.theme-map-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:0.75rem;
+}
+.theme-card {
+  background:rgba(250,247,240,0.72);
+  border:1px solid var(--cream3);
+  border-radius:14px;
+  padding:0.9rem 1rem;
+}
+.theme-card-title {
+  font-size:0.68rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:0.35rem;
+}
+.theme-card-main {
+  font-family:'Spectral',serif;
+  font-style:italic;
+  color:var(--ink);
+  font-size:1rem;
+  line-height:1.35;
+}
+.theme-card-sub {
+  color:var(--ink-faint);
+  font-size:0.75rem;
+  margin-top:0.35rem;
+  line-height:1.45;
+}
+.theme-meter {
+  height:3px;
+  background:var(--cream3);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:0.65rem;
+}
+.theme-meter span {
+  display:block;
+  height:100%;
+  width:var(--theme-width,50%);
+  background:var(--ink);
+  opacity:0.75;
+}
+
+.no-data-msg { text-align:center; padding:3rem 2rem; color:var(--ink-faint); font-style:italic; line-height:1.8; }
+
+/* energy chart */
+.energy-chart { display:flex; align-items:flex-end; gap:4px; height:60px; margin-top:0.5rem; }
+.energy-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; }
+.energy-bar { width:100%; border-radius:2px 2px 0 0; background:var(--ink); opacity:0.35; transition:height 0.5s ease; min-height:2px; }
+.energy-bar-date { font-size:9px; color:var(--ink-faint); writing-mode:vertical-rl; transform:rotate(180deg); height:28px; display:flex; align-items:center; }
+
+/* SUCCESS */
+#success-screen {
+  display:none; position:fixed; inset:0; background:var(--cream); z-index:200;
+  flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:2rem;
+}
+#success-screen.show { display:flex; }
+#success-canvas-wrap { width:320px; height:320px; margin:1.25rem auto; border-radius:18px; overflow:hidden; background:linear-gradient(145deg,var(--cream2),var(--cream3)); position:relative; box-shadow:inset 0 0 0 1px rgba(201,168,76,0.18), 0 18px 45px rgba(58,53,48,0.1); }
+#success-canvas-wrap canvas { display:block !important; pointer-events:none; }
+
+.ai-response ul.insight-bullets {
+  margin: 0;
+  padding-left: 1.15rem;
+  text-align: left;
+}
+.ai-response ul.insight-bullets li {
+  margin: 0.45rem 0;
+  line-height: 1.6;
+}
+#success-canvas-wrap svg, #detail-canvas-wrap svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+.success-title { font-family:'Spectral',serif; font-size:1.7rem; font-weight:300; font-style:italic; margin-bottom:0.4rem; }
+.success-sub { font-size:0.85rem; color:var(--ink-faint); font-style:italic; margin-bottom:1.75rem; max-width:340px; line-height:1.7; }
+.success-actions { display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center; }
+.btn-outline {
+  background:none; border:1px solid var(--cream3); border-radius:30px;
+  padding:0.65rem 1.5rem; font-family:'Spectral',serif; font-style:italic;
+  font-size:0.9rem; color:var(--ink); cursor:pointer; transition:all 0.2s;
+}
+.btn-outline:hover { border-color:var(--ink); }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.fade-in { animation:fadeIn 0.45s ease forwards; }
+
+@media(max-width:600px) {
+  .nav-links { gap:0.9rem; }
+  .nav-links button { font-size:0.72rem; }
+  .form-title { font-size:1.5rem; }
+  .Journal-grid { grid-template-columns:1fr 1fr; }
+  .Insights-grid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:400px) {
+  .Journal-grid { grid-template-columns:1fr; }
+  .Insights-grid { grid-template-columns:1fr; }
+}
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; } }
+
+#success-canvas-wrap,
+#detail-canvas-wrap,
+.card-mini-wrap {
+  background:#FAF8F3 !important;
+}
+
+#success-canvas-wrap.revealing,
+#detail-canvas-wrap.revealing {
+  animation: constellationReveal 1.6s ease-out both;
+}
+
+@keyframes constellationReveal {
+  from { opacity:0; transform:translateY(10px) scale(0.985); filter:blur(2px); }
+  to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+}
+
+
+/* Robust fallback views */
+.Galaxy-fallback {
+  position:absolute; inset:0; padding:7rem 1.5rem 4rem; overflow:auto;
+  background:radial-gradient(circle at 50% 45%, rgba(201,168,76,.10), transparent 34%), var(--cream2);
+}
+.Galaxy-fallback-grid { max-width:980px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1rem; }
+.Galaxy-fallback-card {
+  border:1px solid rgba(30,30,30,.16); background:rgba(250,247,240,.84); border-radius:18px;
+  padding:1rem; cursor:pointer; transition:transform .18s ease, box-shadow .18s ease; text-align:left; font-family:inherit; color:inherit;
+}
+.Galaxy-fallback-card:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(30,30,30,.08); }
+.Galaxy-mini-svg { height:92px; margin:.65rem 0; border-radius:12px; overflow:hidden; background:#fbf9f4; }
+.app-toast {
+  position:fixed; left:50%; bottom:1.25rem; transform:translateX(-50%);
+  z-index:1000; background:rgba(30,30,30,.90); color:var(--cream); padding:.7rem 1rem;
+  border-radius:999px; font-size:.85rem; opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+.app-toast.show { opacity:1; }
+
+
+/* Interactive Galaxy upgrade */
+#Galaxy-canvas-wrap {
+  background:
+    radial-gradient(circle at 22% 18%, rgba(122,114,160,.26), transparent 28%),
+    radial-gradient(circle at 78% 70%, rgba(201,168,76,.18), transparent 30%),
+    linear-gradient(145deg, #111523 0%, #171629 44%, #231b27 100%);
+  border-top:1px solid rgba(255,255,255,.08);
+  touch-action:none;
+}
+.Galaxy-overlay {
+  color:#FAF7F0;
+  background:linear-gradient(180deg, rgba(17,21,35,.78), rgba(17,21,35,0));
+  text-shadow:0 2px 18px rgba(0,0,0,.35);
+}
+.Galaxy-title { color:#FAF7F0; letter-spacing:.02em; }
+.Galaxy-subtitle, .Galaxy-hint { color:rgba(250,247,240,.72); }
+.Galaxy-hint {
+  background:rgba(250,247,240,.08);
+  border:1px solid rgba(250,247,240,.14);
+  padding:.45rem .8rem;
+  border-radius:999px;
+  backdrop-filter:blur(8px);
+}
+.entry-tooltip {
+  background:rgba(250,247,240,.94);
+  border:1px solid rgba(250,247,240,.45);
+  box-shadow:0 18px 45px rgba(0,0,0,.25);
+  backdrop-filter:blur(10px);
+}
+.Galaxy-fallback.interactive {
+  background:
+    radial-gradient(circle at 25% 20%, rgba(122,114,160,.28), transparent 28%),
+    radial-gradient(circle at 75% 70%, rgba(201,168,76,.16), transparent 30%),
+    linear-gradient(145deg, #111523 0%, #171629 44%, #231b27 100%);
+}
+.Galaxy-fallback.interactive .empty-Journal,
+.Galaxy-fallback.interactive .card-date,
+.Galaxy-fallback.interactive .card-snippet { color:rgba(250,247,240,.72); }
+.Galaxy-fallback.interactive .Galaxy-fallback-card {
+  color:#FAF7F0;
+  background:rgba(250,247,240,.08);
+  border-color:rgba(250,247,240,.16);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+}
+.Galaxy-fallback.interactive .Galaxy-fallback-card:hover {
+  transform:translateY(-4px) scale(1.015);
+  box-shadow:0 22px 55px rgba(0,0,0,.26), 0 0 32px rgba(201,168,76,.12);
+}
+.Galaxy-fallback.interactive .Galaxy-mini-svg {
+  background:rgba(250,247,240,.92);
+}
+
+</style>
+<style id="immersive-galaxy-upgrade">
+/* Immersive Galaxy upgrade */
+#galaxyCanvas, .galaxy-canvas, canvas[id*="galaxy"], canvas[class*="galaxy"] {
+  filter: drop-shadow(0 18px 40px rgba(28, 22, 18, .08));
+}
+
+.Galaxy-section, #Galaxy, #galaxy, .Galaxy, .galaxy {
+  position: relative;
+  overflow: hidden;
+}
+
+.Galaxy-section::before, #Galaxy::before, #galaxy::before, .Galaxy::before, .galaxy::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(255,255,255,.95), transparent 2px),
+    radial-gradient(circle at 68% 28%, rgba(255,255,255,.75), transparent 1.5px),
+    radial-gradient(circle at 82% 72%, rgba(255,255,255,.6), transparent 1px),
+    radial-gradient(circle at 34% 80%, rgba(255,255,255,.65), transparent 1px),
+    radial-gradient(ellipse at 50% 50%, rgba(208,188,170,.14), transparent 58%);
+  opacity: .55;
+  animation: galaxyBreath 14s ease-in-out infinite;
+}
+
+.Galaxy-section::after, #Galaxy::after, #galaxy::after, .Galaxy::after, .galaxy::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(30, 24, 20, .025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 24, 20, .018) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mix-blend-mode: multiply;
+  opacity: .28;
+}
+
+@keyframes galaxyBreath {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: .42; }
+  50% { transform: translate3d(-1.5%, 1%, 0) scale(1.04); opacity: .68; }
+}
+</style>
+<style id="nav-diamond-polish">
+.nav-links button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+</style><style id="safe-galaxy-evolution-reveal-style">
+/* Safe cinematic constellation reveal */
+.constellation-stage,
+#constellationPreview,
+.constellation-preview,
+#previewCanvas,
+.preview-canvas {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.constellation-reveal-active {
+  animation: constellationRevealFade 1.15s ease both;
+}
+
+@keyframes constellationRevealFade {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.965);
+    filter: blur(5px);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.galaxy-evolution-thread {
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  opacity: 0.38;
+  background:
+    radial-gradient(circle at 25% 35%, rgba(255,255,255,.22), transparent 2px),
+    radial-gradient(circle at 48% 48%, rgba(255,255,255,.18), transparent 1.5px),
+    radial-gradient(circle at 72% 30%, rgba(255,255,255,.24), transparent 2px),
+    linear-gradient(110deg, transparent 28%, rgba(255,255,255,.08), transparent 62%);
+  animation: galaxyEvolutionDrift 10s ease-in-out infinite;
+}
+
+@keyframes galaxyEvolutionDrift {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: .25; }
+  50% { transform: translate3d(8px,-6px,0) scale(1.03); opacity: .48; }
+}
+</style><style id="thin-hover-lines">
+/* Thinner constellation hover lines */
+canvas {
+  --hover-line-thickness: 0.6;
+}
+
+.galaxy-hover-line,
+.constellation-hover-line {
+  stroke-width: 0.6 !important;
+  opacity: 0.75;
+}
+</style></head>
+<body>
+<nav>
+<div class="nav-logo">✦ <span>Mood Constellation</span></div>
+<div class="nav-links">
+<button class="active" id="tab-form" onclick="showPage('form')">✦ Tonight</button>
+<button id="tab-Galaxy" onclick="showPage('Galaxy')">✦ Galaxy</button>
+<button id="tab-Journal" onclick="showPage('Journal')">✦ Journal</button>
+<button id="tab-Insights" onclick="showPage('Insights')">✦ Insights</button>
+</div>
+<div class="auth-pill" id="auth-pill" style="display:none">
+<span>signed in as</span><strong id="auth-email-label"></strong>
+<button onclick="signOut()">switch</button>
+</div>
+</nav>
+<div id="auth-screen">
+<div class="auth-card">
+<div class="auth-stars">✦ ✧ ✦</div>
+<h1>Create your sky account</h1>
+<p>Create an account or sign in to sync your saved constellations across devices.</p>
+<input autocomplete="email" id="auth-email" placeholder="your email" type="email"/>
+<input autocomplete="current-password" id="auth-password" minlength="6" placeholder="password" type="password"/>
+<button class="submit-btn" onclick="createAccount()" style="margin-top:0">create account ✦</button>
+<button class="submit-btn secondary-auth-btn" onclick="signIn()" style="margin-top:0.7rem">sign in to my Galaxy</button>
+<p class="auth-note" id="auth-note">Cloud sync uses Firebase Auth + Firestore. Add your Firebase config in the code to turn on cross-device syncing.</p>
+</div>
+</div>
+<!-- ════ FORM ════ -->
+<main class="page active" id="page-form">
+<div class="form-wrap fade-in">
+<div class="form-header">
+<div class="doodle-stars">· ✦ · ✧ · ✦ ·</div>
+<p class="form-date" id="today-label"></p>
+<h1 class="form-title">How was your sky today?</h1>
+<p class="form-subtitle">A quiet ritual. A little light left behind.</p>
+</div>
+<p class="space-blurb" id="rotating-blurb"></p>
+<!-- Q1 Mood -->
+<div class="q-block">
+<label class="q-label">How are you feeling today?</label>
+<div class="mood-chips" id="mood-chips">
+<button class="mood-chip" data-mood="glowing">✦ glowing</button>
+<button class="mood-chip" data-mood="steady">○ steady</button>
+<button class="mood-chip" data-mood="cloudy">~ cloudy</button>
+<button class="mood-chip" data-mood="heavy">↓ heavy</button>
+<button class="mood-chip" data-mood="scattered">· scattered</button>
+<button class="mood-chip" data-mood="tender">◇ tender</button>
+<button class="mood-chip" data-mood="hopeful">↑ hopeful</button>
+<button class="mood-chip" data-mood="overwhelmed">≋ overwhelmed</button>
+<button class="mood-chip" data-mood="peaceful">∿ peaceful</button>
+<button class="mood-chip" data-mood="excited">★ excited</button>
+</div>
+</div>
+<!-- Q2 Energy -->
+<div class="q-block">
+<label class="q-label">Energy today?</label>
+<div class="energy-wrap">
+<span style="font-size:0.75rem;color:var(--ink-faint);font-style:italic">low</span>
+<input id="energy-slider" max="5" min="1" step="1" type="range" value="3"/>
+<span style="font-size:0.75rem;color:var(--ink-faint);font-style:italic">high</span>
+<span class="energy-val" id="energy-val">3</span>
+</div>
+</div>
+<!-- Q3-6 -->
+<div class="q-block">
+<label class="q-label" for="gratitude">What are you grateful for today?</label>
+<p class="q-hint">This becomes the brightest star in your constellation.</p>
+<textarea class="q-textarea" id="gratitude" placeholder="something small is enough…" rows="2"></textarea>
+</div>
+<div class="q-block">
+<label class="q-label" for="hard-thing">What felt hard today?</label>
+<p class="q-hint">Even hard things belong in the sky.</p>
+<textarea class="q-textarea" id="hard-thing" placeholder="it's okay to name it…" rows="2"></textarea>
+</div>
+<div class="q-block">
+<label class="q-label" for="tiny-win">One tiny win from today?</label>
+<p class="q-hint">This becomes a shooting star.</p>
+<textarea class="q-textarea" id="tiny-win" placeholder="even showing up counts…" rows="2"></textarea>
+</div>
+<div class="q-block">
+<label class="q-label" for="tomorrow">What do you want to carry into tomorrow?</label>
+<p class="q-hint">This becomes your guiding star.</p>
+<textarea class="q-textarea" id="tomorrow" placeholder="one word or one wish…" rows="2"></textarea>
+</div>
+<!-- Q7 Tags -->
+<div class="q-block">
+<label class="q-label">Any feelings worth naming? <span style="color:var(--ink-faint);font-weight:300">(optional)</span></label>
+<div class="tag-chips" id="tag-chips">
+<button class="tag-chip" data-tag="creative">creative</button>
+<button class="tag-chip" data-tag="tired">tired</button>
+<button class="tag-chip" data-tag="social">social</button>
+<button class="tag-chip" data-tag="anxious">anxious</button>
+<button class="tag-chip" data-tag="cozy">cozy</button>
+<button class="tag-chip" data-tag="productive">productive</button>
+<button class="tag-chip" data-tag="messy">messy</button>
+<button class="tag-chip" data-tag="joyful">joyful</button>
+<button class="tag-chip" data-tag="overstimulated">overstimulated</button>
+<button class="tag-chip" data-tag="calm">calm</button>
+<button class="tag-chip" data-tag="brave">brave</button>
+<button class="tag-chip" data-tag="soft">soft</button>
+</div>
+</div>
+<hr class="section-rule"/>
+<button class="submit-btn" onclick="submitEntry()">draw my constellation ✦</button>
+<p class="fact-pill" id="space-fact"></p>
+</div>
+</main>
+<!-- ════ GALAXY ════ -->
+<main class="page" id="page-Galaxy">
+<div id="Galaxy-canvas-wrap">
+<div class="Galaxy-overlay">
+<h2 class="Galaxy-title">My Galaxy</h2>
+<p class="Galaxy-subtitle">Every day you check in, your Galaxy grows.</p>
+</div>
+<div class="entry-tooltip" id="entry-tooltip">
+<div class="tt-date" id="tt-date"></div>
+<div id="tt-mood" style="font-family:'Spectral',serif;font-style:italic"></div>
+<div id="tt-snippet" style="font-size:0.72rem;color:var(--ink-faint);font-style:italic;margin-top:0.2rem"></div>
+</div>
+<p class="Galaxy-hint">scroll to zoom · drag to pan · click to open</p>
+</div>
+</main>
+<!-- ════ JOURNAL ════ -->
+<main class="page" id="page-Journal">
+<div class="Journal-wrap">
+<div class="Journal-header fade-in">
+<div class="doodle-stars">· ✦ · ✧ · ✦ ·</div>
+<h2 class="Journal-title">Constellation Journal</h2>
+<p class="Journal-count" id="Journal-count"></p>
+</div>
+<div class="Journal-grid" id="Journal-grid"></div>
+</div>
+</main>
+<!-- ════ DETAIL ════ -->
+<main class="page" id="page-detail">
+<div class="detail-wrap">
+<button class="detail-back" onclick="showPage('Journal')">← back to Journal</button>
+<p class="detail-date" id="detail-date"></p>
+<h2 class="detail-mood-title" id="detail-mood-title"></h2>
+<div id="detail-canvas-wrap"></div>
+<div class="symbolic-legend" id="symbolic-legend"></div>
+<hr class="section-rule"/>
+<div id="detail-content"></div>
+<button class="delete-btn" onclick="deleteEntry()">remove this constellation</button>
+<p class="space-blurb" id="detail-blurb"></p>
+</div>
+</main>
+<!-- ════ INSIGHTS ════ -->
+<main class="page" id="page-Insights">
+<div class="Insights-wrap">
+<div class="Insights-header fade-in">
+<div class="doodle-stars">· ✦ · ✧ · ✦ ·</div>
+<h2 class="Insights-title">Sky Patterns</h2>
+<p class="Insights-subtitle">What the stars are telling you about your days.</p>
+</div>
+<div id="Insights-body"></div>
+</div>
+</main>
+<!-- ════ SUCCESS ════ -->
+<div id="success-screen">
+<div class="doodle-stars">· ✦ · ✧ · ✦ · ✧ · ✦ ·</div>
+<h2 class="success-title">Your constellation is drawn.</h2>
+<div id="success-canvas-wrap"></div>
+<p class="success-sub" id="success-message"></p>
+<div class="success-actions">
+<button class="btn-outline" onclick="viewNewDetail()">see my constellation</button>
+<button class="btn-outline" onclick="closeSuccess();showPage('Galaxy')">visit my Galaxy</button>
+<button class="btn-outline" onclick="closeSuccess()">keep writing</button>
+</div>
+</div>
+<!-- p5.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<!-- Optional cloud sync: fill FIREBASE_CONFIG below, then enable Email/Password Auth + Firestore in Firebase. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+// ══════════════════════════════════════════════════
+//  ACCOUNTS + STORAGE
+// ══════════════════════════════════════════════════
+const AUTH_KEY = 'mcd_current_email_v1';
+const STORAGE_PREFIX = 'mcd_entries_v3_';
+const JOURNAL_CLEAR_MARKER = 'mcd_cleared_journal_2026_05_06_fix_v1';
+
+/*
+  To turn on real cross-device syncing:
+  1) Create a Firebase project at https://console.firebase.google.com/
+  2) Enable Authentication → Email/Password
+  3) Enable Firestore Database
+  4) Replace the placeholder values below with your Firebase web app config
+
+  Until you add real values, the app still works locally in this browser so you can design/test safely.
+*/
+const FIREBASE_CONFIG = {
+  apiKey: "PASTE_FIREBASE_API_KEY",
+  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_PROJECT_ID.appspot.com",
+  messagingSenderId: "PASTE_MESSAGING_SENDER_ID",
+  appId: "PASTE_FIREBASE_APP_ID"
+};
+
+let currentUserEmail = '';
+let currentUserId = '';
+let cachedEntries = [];
+let firebaseReady = false;
+let auth = null;
+let db = null;
+let unsubscribeEntries = null;
+
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[ch]));
+}
+
+function notify(message) {
+  let toast = document.getElementById('app-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'app-toast';
+    toast.className = 'app-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add('show');
+  window.clearTimeout(notify._timer);
+  notify._timer = window.setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+function normalizeEmail(email) {
+  return (email || '').trim().toLowerCase();
+}
+
+function isFirebaseConfigured() {
+  return FIREBASE_CONFIG.apiKey && !String(FIREBASE_CONFIG.apiKey).includes('PASTE_');
+}
+
+function storageKey(email = currentUserEmail) {
+  return STORAGE_PREFIX + encodeURIComponent(email || 'guest');
+}
+
+function loadLocalEntries(email = currentUserEmail) {
+  if (!email) return [];
+  try { return JSON.parse(localStorage.getItem(storageKey(email)) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveLocalEntries(entries, email = currentUserEmail) {
+  if (!email) return;
+  localStorage.setItem(storageKey(email), JSON.stringify(entries || []));
+}
+
+function clearExistingJournalSubmissionsOnce() {
+  if (localStorage.getItem(JOURNAL_CLEAR_MARKER)) return false;
+
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith(STORAGE_PREFIX)) localStorage.removeItem(key);
+  });
+
+  cachedEntries = [];
+  localStorage.setItem(JOURNAL_CLEAR_MARKER, 'true');
+  return true;
+}
+
+function loadEntries() {
+  if (!currentUserEmail) return [];
+  return cachedEntries || [];
+}
+
+function saveEntries(entries) {
+  cachedEntries = Array.isArray(entries) ? entries : [];
+  saveLocalEntries(cachedEntries);
+
+  if (firebaseReady && db && currentUserId) {
+    db.collection('users').doc(currentUserId).set({
+      email: currentUserEmail,
+      entries: cachedEntries,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(err => {
+      console.error('Cloud save failed:', err);
+      notify('Saved on this device, but cloud sync had trouble.');
+    });
+  }
+}
+
+function addEntry(entry) {
+  const entries = loadEntries();
+  entries.unshift(entry);
+  saveEntries(entries);
+}
+
+function deleteEntryById(id) {
+  saveEntries(loadEntries().filter(e => e.id !== id));
+}
+
+function updateAuthNote(message) {
+  const note = document.getElementById('auth-note');
+  if (note) note.textContent = message;
+}
+
+function getAuthFields() {
+  const email = normalizeEmail(document.getElementById('auth-email')?.value);
+  const password = document.getElementById('auth-password')?.value || '';
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+    alert('Please enter a valid email ✦');
+    return null;
+  }
+  if (password.length < 6) {
+    alert('Please enter a password with at least 6 characters ✦');
+    return null;
+  }
+  return { email, password };
+}
+
+async function createAccount() {
+  const fields = getAuthFields();
+  if (!fields) return;
+
+  if (!firebaseReady) {
+    currentUserEmail = fields.email;
+    currentUserId = 'local-' + encodeURIComponent(fields.email);
+    cachedEntries = loadLocalEntries(fields.email);
+    localStorage.setItem(AUTH_KEY, fields.email);
+    applyAuthState();
+    notify('Local account created. Add Firebase config to sync across devices ✦');
+    return;
+  }
+
+  try {
+    const result = await auth.createUserWithEmailAndPassword(fields.email, fields.password);
+    currentUserEmail = normalizeEmail(result.user.email);
+    currentUserId = result.user.uid;
+    await loadCloudEntries();
+    applyAuthState();
+    notify('Account created — your sky will sync ✦');
+  } catch (err) {
+    console.error(err);
+    alert(readableAuthError(err));
+  }
+}
+
+async function signIn() {
+  const fields = getAuthFields();
+  if (!fields) return;
+
+  if (!firebaseReady) {
+    currentUserEmail = fields.email;
+    currentUserId = 'local-' + encodeURIComponent(fields.email);
+    cachedEntries = loadLocalEntries(fields.email);
+    localStorage.setItem(AUTH_KEY, fields.email);
+    applyAuthState();
+    notify('Signed in locally. Add Firebase config to sync across devices ✦');
+    return;
+  }
+
+  try {
+    const result = await auth.signInWithEmailAndPassword(fields.email, fields.password);
+    currentUserEmail = normalizeEmail(result.user.email);
+    currentUserId = result.user.uid;
+    await loadCloudEntries();
+    applyAuthState();
+    notify('Signed in — your synced sky is ready ✦');
+  } catch (err) {
+    console.error(err);
+    alert(readableAuthError(err));
+  }
+}
+
+async function signOut() {
+  if (unsubscribeEntries) {
+    unsubscribeEntries();
+    unsubscribeEntries = null;
+  }
+  if (firebaseReady && auth) {
+    await auth.signOut().catch(console.error);
+  }
+  localStorage.removeItem(AUTH_KEY);
+  currentUserEmail = '';
+  currentUserId = '';
+  cachedEntries = [];
+  applyAuthState();
+  showPage('form');
+}
+
+function readableAuthError(err) {
+  const code = err?.code || '';
+  if (code.includes('email-already-in-use')) return 'That email already has an account. Try signing in instead ✦';
+  if (code.includes('user-not-found') || code.includes('wrong-password') || code.includes('invalid-credential')) return 'Email or password did not match an account ✦';
+  if (code.includes('weak-password')) return 'Please use a stronger password with at least 6 characters ✦';
+  if (code.includes('network')) return 'Network error. Check your connection and try again ✦';
+  return err?.message || 'Something went wrong with account access ✦';
+}
+
+async function loadCloudEntries() {
+  if (!firebaseReady || !db || !currentUserId) return;
+
+  const ref = db.collection('users').doc(currentUserId);
+  const localBeforeCloud = loadLocalEntries(currentUserEmail);
+  const snap = await ref.get();
+
+  if (snap.exists) {
+    cachedEntries = Array.isArray(snap.data().entries) ? snap.data().entries : [];
+    // One-time migration: if this browser has local entries that cloud does not, merge by id.
+    if (localBeforeCloud.length) {
+      const byId = new Map(cachedEntries.map(entry => [entry.id, entry]));
+      localBeforeCloud.forEach(entry => byId.set(entry.id, entry));
+      cachedEntries = Array.from(byId.values()).sort((a,b) => String(b.id).localeCompare(String(a.id)));
+      await ref.set({ email: currentUserEmail, entries: cachedEntries, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    }
+  } else {
+    cachedEntries = localBeforeCloud;
+    await ref.set({ email: currentUserEmail, entries: cachedEntries, createdAt: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  }
+
+  saveLocalEntries(cachedEntries);
+  watchCloudEntries();
+}
+
+function watchCloudEntries() {
+  if (!firebaseReady || !db || !currentUserId) return;
+  if (unsubscribeEntries) unsubscribeEntries();
+
+  unsubscribeEntries = db.collection('users').doc(currentUserId).onSnapshot(snap => {
+    if (!snap.exists) return;
+    const nextEntries = Array.isArray(snap.data().entries) ? snap.data().entries : [];
+    cachedEntries = nextEntries;
+    saveLocalEntries(cachedEntries);
+    renderJournal();
+    if (document.getElementById('page-Galaxy')?.classList.contains('active')) initGalaxy();
+    if (document.getElementById('page-detail')?.classList.contains('active') && currentDetailId) openDetail(currentDetailId);
+    if (document.getElementById('page-Insights')?.classList.contains('active')) renderInsightsPage();
+  }, err => {
+    console.error('Cloud listener failed:', err);
+    notify('Cloud sync paused. Your local copy is still safe.');
+  });
+}
+
+function applyAuthState() {
+  const screen = document.getElementById('auth-screen');
+  const pill = document.getElementById('auth-pill');
+  const label = document.getElementById('auth-email-label');
+
+  if (currentUserEmail) {
+    screen?.classList.remove('show');
+    if (pill) pill.style.display = 'flex';
+    if (label) label.textContent = currentUserEmail + (firebaseReady ? ' · synced' : ' · local');
+    renderJournal();
+    if (document.getElementById('page-Galaxy')?.classList.contains('active')) initGalaxy();
+    if (document.getElementById('page-Insights')?.classList.contains('active')) renderInsightsPage();
+  } else {
+    screen?.classList.add('show');
+    if (pill) pill.style.display = 'none';
+  }
+}
+
+function initAccountSystem() {
+  if (isFirebaseConfigured() && window.firebase) {
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      auth = firebase.auth();
+      db = firebase.firestore();
+      firebaseReady = true;
+      updateAuthNote('Create an account or sign in. Your constellations will sync between devices.');
+
+      auth.onAuthStateChanged(async user => {
+        if (user) {
+          currentUserEmail = normalizeEmail(user.email);
+          currentUserId = user.uid;
+          localStorage.setItem(AUTH_KEY, currentUserEmail);
+          await loadCloudEntries().catch(err => {
+            console.error(err);
+            cachedEntries = loadLocalEntries(currentUserEmail);
+            notify('Cloud load failed, showing this device’s saved sky.');
+          });
+          if (clearExistingJournalSubmissionsOnce()) {
+            cachedEntries = [];
+            saveLocalEntries([], currentUserEmail);
+            if (firebaseReady && db && currentUserId) {
+              db.collection('users').doc(currentUserId).set({
+                email: currentUserEmail,
+                entries: [],
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              }, { merge: true }).catch(console.error);
+            }
+          }
+        } else {
+          currentUserEmail = '';
+          currentUserId = '';
+          cachedEntries = [];
+        }
+        applyAuthState();
+      });
+    } catch (err) {
+      console.error('Firebase init failed:', err);
+      firebaseReady = false;
+      initLocalAccountFallback();
+    }
+  } else {
+    initLocalAccountFallback();
+  }
+}
+
+function initLocalAccountFallback() {
+  firebaseReady = false;
+  const savedEmail = normalizeEmail(localStorage.getItem(AUTH_KEY));
+  if (savedEmail) {
+    currentUserEmail = savedEmail;
+    currentUserId = 'local-' + encodeURIComponent(savedEmail);
+    cachedEntries = loadLocalEntries(savedEmail);
+  }
+  if (clearExistingJournalSubmissionsOnce()) {
+    cachedEntries = [];
+    if (currentUserEmail) saveLocalEntries([], currentUserEmail);
+  }
+  updateAuthNote('Design/testing mode: entries save in this browser. Add Firebase config in the code to sync accounts across devices.');
+  applyAuthState();
+}
+
+// ══════════════════════════════════════════════════
+//  BLURBS / FACTS
+// ══════════════════════════════════════════════════
+const BLURBS = [
+  '"A constellation is a story humans drew between points of light."',
+  '"Even quiet stars are still burning."',
+  '"Galaxies grow slowly. So do people."',
+  '"Your day does not need to be perfect to become part of the sky."',
+  '"Some stars only appear close together from Earth."',
+  '"The light reaching us Tonight left its star long ago."',
+  '"Stillness has its own brightness."',
+  '"You are the astronomer and the star."'
+];
+const FACTS = [
+  '✦ Nebulas are stellar nurseries — clouds of gas where stars are born.',
+  '✦ Stars twinkle because their light bends through Earth\'s shifting atmosphere.',
+  '✦ The Milky Way has over 200 billion stars.',
+  '✦ A shooting star is a tiny grain of cosmic dust burning up.',
+  '✦ The Moon drifts 3.8cm further from Earth every year.',
+  '✦ Some stars we see no longer exist — we see only their ancient light.',
+  '✦ Sirius, the brightest star, is just 8.6 light-years away.',
+  '✦ The Sun is a relatively young star in our Galaxy\'s history.'
+];
+
+let _bi = Math.floor(Math.random() * BLURBS.length);
+let _fi = Math.floor(Math.random() * FACTS.length);
+
+function setBlurbs() {
+  const el = document.getElementById('rotating-blurb');
+  if (el) el.textContent = BLURBS[_bi++ % BLURBS.length];
+  const fe = document.getElementById('space-fact');
+  if (fe) fe.textContent = FACTS[_fi++ % FACTS.length];
+}
+
+// ══════════════════════════════════════════════════
+//  DATE / TIME
+// ══════════════════════════════════════════════════
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function getNow() {
+  const n = new Date();
+  return {
+    date: n.toISOString().split('T')[0],
+    time: n.toTimeString().slice(0,5),
+    dayOfWeek: DAYS[n.getDay()],
+    month: MONTHS[n.getMonth()],
+    year: n.getFullYear(),
+    display: `${DAYS[n.getDay()]}, ${MONTHS[n.getMonth()]} ${n.getDate()}, ${n.getFullYear()}`
+  };
+}
+
+// ══════════════════════════════════════════════════
+//  CONSTELLATION DATA GENERATION
+// ══════════════════════════════════════════════════
+const MOOD_PARAMS = {
+  glowing:     { shape:'ribbon',   spread:1.00, brightness:1.25, density:1.08, curve:0.72, flow:0.74 },
+  steady:      { shape:'vertical', spread:0.86, brightness:1.00, density:0.92, curve:0.50, flow:0.45 },
+  cloudy:      { shape:'drift',    spread:0.90, brightness:0.76, density:0.90, curve:0.66, flow:0.72 },
+  heavy:       { shape:'low',      spread:0.82, brightness:0.70, density:0.78, curve:0.32, flow:0.35 },
+  scattered:   { shape:'loose',    spread:1.18, brightness:0.82, density:0.76, curve:0.48, flow:0.52 },
+  tender:      { shape:'sCurve',   spread:0.92, brightness:0.92, density:0.88, curve:0.78, flow:0.76 },
+  hopeful:     { shape:'rise',     spread:0.98, brightness:1.08, density:0.96, curve:0.55, flow:0.62 },
+  overwhelmed: { shape:'loose',    spread:1.24, brightness:0.72, density:1.04, curve:0.70, flow:0.72 },
+  peaceful:    { shape:'wave',     spread:0.84, brightness:1.00, density:0.72, curve:0.82, flow:0.84 },
+  excited:     { shape:'ribbon',   spread:1.10, brightness:1.22, density:1.08, curve:0.64, flow:0.70 }
+};
+
+function mkRand(seed) {
+  let s = 0;
+  for (let i = 0; i < seed.length; i++) s = (s * 31 + seed.charCodeAt(i)) >>> 0;
+  s = s || 99991;
+  return function() {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+function generateConstellationData(entry) {
+  const params = MOOD_PARAMS[entry.mood] || MOOD_PARAMS.steady;
+  const energy = Math.max(1, Math.min(5, Number(entry.energy) || 3));
+  const rand = mkRand(entry.constellationSeed || entry.id || 'default');
+
+  // Mood now changes the composition like a hand-drawn celestial tattoo:
+  // density = how many anchor stars, spacing = how airy it feels, flow = how much the ink lines swirl.
+  const spacingByMood = {
+    glowing: 0.16, steady: 0.17, cloudy: 0.16, heavy: 0.19, scattered: 0.22,
+    tender: 0.17, hopeful: 0.16, overwhelmed: 0.20, peaceful: 0.20, excited: 0.15
+  };
+  const targetStars = Math.round((5 + energy * 1.55) * (params.density || 1));
+  const minSpacing = spacingByMood[entry.mood] || 0.17;
+  const stars = [];
+
+  function pathPoint(t) {
+    let x, y;
+    const wob = (rand() - 0.5) * 0.045 * params.spread;
+    switch (params.shape) {
+      case 'vertical':
+        x = 0.52 + Math.sin(t * Math.PI * 2.1 + 0.7) * 0.18 + wob;
+        y = 0.10 + t * 0.80 + (rand() - 0.5) * 0.04;
+        break;
+      case 'rise':
+        x = 0.18 + t * 0.66 + Math.sin(t * Math.PI * 2.0) * 0.10 + wob;
+        y = 0.78 - t * 0.62 + Math.sin(t * Math.PI * 1.2) * 0.08 + (rand() - 0.5) * 0.035;
+        break;
+      case 'low':
+        x = 0.16 + t * 0.68 + Math.sin(t * Math.PI * 1.6) * 0.08 + wob;
+        y = 0.58 + Math.sin(t * Math.PI * 2.1) * 0.12 + rand() * 0.12;
+        break;
+      case 'loose':
+        x = 0.14 + rand() * 0.72;
+        y = 0.12 + rand() * 0.76;
+        break;
+      case 'wave':
+        x = 0.12 + t * 0.76;
+        y = 0.50 + Math.sin(t * Math.PI * 2.15) * 0.20 + Math.sin(t * Math.PI * 5.0) * 0.035;
+        break;
+      case 'drift':
+        x = 0.18 + t * 0.64 + Math.sin(t * Math.PI * 3.0) * 0.13 + wob;
+        y = 0.36 + Math.sin(t * Math.PI * 1.35 + 0.4) * 0.20 + (rand() - 0.5) * 0.08;
+        break;
+      case 'ribbon':
+        x = 0.12 + t * 0.76;
+        y = 0.46 + Math.sin(t * Math.PI * 2.45 + 0.2) * 0.22 + Math.sin(t * Math.PI * 5.5) * 0.035;
+        break;
+      case 'sCurve':
+      default:
+        x = 0.50 + Math.sin((t - 0.5) * Math.PI * 1.45) * 0.25 + wob;
+        y = 0.10 + t * 0.80 + Math.sin(t * Math.PI * 3.1) * 0.045;
+    }
+    return {
+      x: Math.max(0.075, Math.min(0.925, x)),
+      y: Math.max(0.075, Math.min(0.925, y))
+    };
+  }
+
+  for (let i = 0; i < targetStars; i++) {
+    const t = targetStars > 1 ? i / (targetStars - 1) : 0.5;
+    let point = pathPoint(t);
+    for (let tries = 0; tries < 28; tries++) {
+      const tooClose = stars.some(s => Math.hypot(s.x - point.x, s.y - point.y) < minSpacing);
+      if (!tooClose) break;
+      point = pathPoint(Math.max(0, Math.min(1, t + (rand() - 0.5) * 0.22)));
+    }
+
+    const major = i === 0 || i === targetStars - 1 || rand() < 0.30;
+    stars.push({
+      ...point,
+      order: i,
+      size: major ? 4.2 + rand() * 2.5 : 2.5 + rand() * 1.6,
+      brightness: Math.min(1, 0.62 + rand() * 0.34 + (params.brightness - 1) * 0.10),
+      type: 'normal',
+      style: major ? (rand() < 0.72 ? 'handstar' : 'needle') : (rand() < 0.44 ? 'tinyStar' : 'dot')
+    });
+  }
+
+  if (entry.gratitude && stars.length > 0) {
+    stars[Math.floor(stars.length / 2)].type = 'gratitude';
+    stars[Math.floor(stars.length / 2)].style = 'needle';
+    stars[Math.floor(stars.length / 2)].size = 6.5;
+    stars[Math.floor(stars.length / 2)].brightness = 1;
+  }
+  if (entry.tinyWin) stars.push({ x:0.18+rand()*0.62, y:0.12+rand()*0.24, type:'shooting', style:'needle', size:4.1, brightness:0.95, order: stars.length });
+  if (entry.tomorrow) stars.push({ x:0.55+rand()*0.24, y:0.10+rand()*0.18, type:'guiding', style:'diamond', size:4.9, brightness:1, order: stars.length });
+  if (entry.hardThing) stars.push({ x:0.12+rand()*0.22, y:0.60+rand()*0.22, type:'shadow', style:'dot', size:2.8, brightness:0.48, order: stars.length });
+
+  const coreCount = targetStars;
+  const connections = [];
+  for (let i = 0; i < coreCount - 1; i++) {
+    connections.push({
+      from: i,
+      to: i + 1,
+      wobble: 0.020 + (params.curve || 0.5) * 0.028,
+      sketch: rand(),
+      broken: !!(entry.hardThing && rand() < 0.10)
+    });
+  }
+
+  // Small branches make it feel like a real constellation without turning messy.
+  const branchChance = entry.mood === 'scattered' || entry.mood === 'overwhelmed' ? 0.22 : 0.32;
+  for (let i = 1; i < coreCount - 2; i++) {
+    if (rand() < branchChance) {
+      let nearest = null;
+      for (let j = 0; j < coreCount; j++) {
+        if (Math.abs(i - j) < 2) continue;
+        const d = Math.hypot(stars[i].x - stars[j].x, stars[i].y - stars[j].y);
+        if (d < 0.30 && (!nearest || d < nearest.d)) nearest = { j, d };
+      }
+      if (nearest) connections.push({ from: i, to: nearest.j, wobble: 0.012 + params.curve * 0.014, sketch: rand(), broken: false, branch: true });
+    }
+  }
+
+  const flourishes = [];
+  const flourishCount = Math.max(2, Math.min(6, Math.round(energy + (params.flow || 0.5) * 3)));
+  for (let i = 0; i < flourishCount; i++) {
+    const anchor = stars[Math.floor(rand() * Math.max(1, coreCount))];
+    flourishes.push({
+      x: anchor.x + (rand() - 0.5) * 0.16,
+      y: anchor.y + (rand() - 0.5) * 0.16,
+      r: 0.045 + rand() * 0.095,
+      turn: rand() < 0.5 ? -1 : 1,
+      rot: rand() * Math.PI * 2,
+      alpha: 0.36 + rand() * 0.30
+    });
+  }
+
+  return { stars, connections, flourishes, params };
+}
+
+// ══════════════════════════════════════════════════
+//  SOFT HAND-DRAWN CONSTELLATION RENDERER
+// ══════════════════════════════════════════════════
+const _sketches = {};
+
+function destroySketch(key) {
+  if (_sketches[key]) { _sketches[key].remove(); delete _sketches[key]; }
+}
+
+
+function constellationSVGMarkup(entryOrData, w = 300, h = 260, opts = {}) {
+  const data = entryOrData?.stars ? entryOrData : generateConstellationData(entryOrData || {});
+  const starMarkup = data.stars.map(s => {
+    const x = s.x * w, y = s.y * h;
+    const r = Math.max(opts.mini ? 2.2 : 3, s.size * (opts.mini ? 1.25 : 2.1));
+    if (s.style === 'needle' || s.type === 'gratitude') {
+      return `<g opacity="${s.brightness || 0.9}"><line x1="${x}" y1="${y-r}" x2="${x}" y2="${y+r}"/><line x1="${x-r*.62}" y1="${y}" x2="${x+r*.62}" y2="${y}"/><line x1="${x-r*.32}" y1="${y-r*.32}" x2="${x+r*.32}" y2="${y+r*.32}"/><line x1="${x+r*.32}" y1="${y-r*.32}" x2="${x-r*.32}" y2="${y+r*.32}"/></g>`;
+    }
+    if (s.style === 'handstar') {
+      let pts = [];
+      for (let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5; const rr=i%2===0?r:r*.42; pts.push(`${x+Math.cos(a)*rr},${y+Math.sin(a)*rr}`); }
+      return `<polygon points="${pts.join(' ')}" opacity="${s.brightness || 0.9}"/>`;
+    }
+    if (s.style === 'diamond') {
+      return `<path d="M ${x} ${y-r} C ${x+r*.34} ${y-r*.18}, ${x+r*.34} ${y+r*.18}, ${x} ${y+r} C ${x-r*.34} ${y+r*.18}, ${x-r*.34} ${y-r*.18}, ${x} ${y-r}" opacity="${s.brightness || 0.9}"/>`;
+    }
+    return `<circle cx="${x}" cy="${y}" r="${Math.max(1.2, s.size*(opts.mini ? .32 : .55))}" fill="#171614" opacity="${s.brightness || 0.8}"/>`;
+  }).join('');
+
+  const lineMarkup = data.connections.map(c => {
+    const a = data.stars[c.from], b = data.stars[c.to];
+    if (!a || !b) return '';
+    const x1=a.x*w, y1=a.y*h, x2=b.x*w, y2=b.y*h;
+    const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy)||1, nx=-dy/len, ny=dx/len;
+    const bow=(c.wobble||0.02)*Math.min(w,h)*(c.sketch<0.5?-1:1);
+    const cx1=x1+dx*.28+nx*bow, cy1=y1+dy*.28+ny*bow;
+    const cx2=x1+dx*.72-nx*bow*.55, cy2=y1+dy*.72-ny*bow*.55;
+    return `<path d="M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}" opacity="${c.branch ? .38 : .55}"/>`;
+  }).join('');
+
+  const flourishMarkup = opts.mini ? '' : (data.flourishes || []).slice(0,5).map(f => {
+    const x=f.x*w, y=f.y*h, r=f.r*Math.min(w,h);
+    return `<path d="M ${x-r*.65} ${y} C ${x-r*.1} ${y-r*.6}, ${x+r*.75} ${y-r*.3}, ${x+r*.25} ${y+r*.22} S ${x-r*.3} ${y+r*.12}, ${x+r*.75} ${y-r*.05}" opacity="${0.22+(f.alpha||0.4)*0.25}"/>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="100%" class="${opts.reveal ? 'svg-reveal' : ''}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="hand-drawn mood constellation">
+    <rect width="100%" height="100%" fill="#fbf9f4"/>
+    <g fill="none" stroke="#171614" stroke-width="${opts.mini ? 0.65 : 0.75}" stroke-linecap="round" stroke-linejoin="round">${flourishMarkup}${lineMarkup}${starMarkup}</g>
+  </svg>`;
+}
+
+function renderConstellationSVG(container, data, opts = {}) {
+  const w = Math.max(300, container.clientWidth || 300);
+  const h = Math.max(220, container.clientHeight || 260);
+  container.innerHTML = constellationSVGMarkup(data, w, h, opts);
+}
+
+function renderConstellation(containerId, entry, opts = {}) {
+  destroySketch(containerId);
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  const data = generateConstellationData(entry);
+  const tags = entry.tags || [];
+
+  // Use SVG for saved previews and success/detail views so the constellation never
+  // depends on the p5 animation loop or canvas sizing. This fixes blank preview blocks.
+  if (!opts.forceP5 || typeof p5 === 'undefined') {
+    renderConstellationSVG(container, data, opts);
+    return null;
+  }
+
+  const sk = new p5(function(p) {
+    let W, H;
+    let reveal = opts.reveal ? 0 : 1;
+
+    function getSize() {
+      const rect = container.getBoundingClientRect();
+      return { w: Math.floor(rect.width) || 300, h: Math.floor(rect.height) || 240 };
+    }
+
+    p.setup = function() {
+      const sz = getSize();
+      W = sz.w; H = sz.h;
+      const cnv = p.createCanvas(W, H);
+      cnv.parent(containerId);
+      cnv.style('display','block');
+      cnv.style('width','100%');
+      cnv.style('height','100%');
+      p.pixelDensity(Math.min(2, window.devicePixelRatio || 1));
+    };
+
+    p.windowResized = function() {
+      const sz = getSize();
+      W = sz.w; H = sz.h;
+      p.resizeCanvas(W, H);
+    };
+
+    p.draw = function() {
+      if (opts.reveal) reveal = Math.min(1, reveal + 0.014);
+      p.background(251, 249, 244);
+
+      // Gentle paper texture.
+      const dustRand = mkRand((entry.constellationSeed || entry.id || 'paper') + '_paper');
+      p.noStroke();
+      for (let i=0; i<34; i++) {
+        p.fill(35, 31, 28, 4);
+        p.ellipse(dustRand()*W, dustRand()*H, 0.55 + dustRand()*1.2, 0.55 + dustRand()*1.2);
+      }
+
+      // Wispy swirls inspired by the second reference image.
+      const flourishLimit = Math.floor((data.flourishes || []).length * Math.min(1, reveal * 1.15));
+      for (let i = 0; i < flourishLimit; i++) {
+        drawInkFlourish(p, data.flourishes[i], W, H, reveal, i);
+      }
+
+      // Hand-drawn constellation lines, slightly irregular like pencil/ink.
+      const stars = data.stars;
+      const conns = data.connections;
+      const lineLimit = Math.floor(conns.length * reveal);
+      for (let idx = 0; idx < lineLimit; idx++) {
+        const c = conns[idx];
+        if (c.from >= stars.length || c.to >= stars.length) continue;
+        drawSketchConnection(p, stars[c.from], stars[c.to], c, W, H, reveal);
+      }
+
+      // Clear stars on top.
+      const starLimit = Math.floor(stars.length * Math.min(1, reveal * 1.22));
+      for (let i = 0; i < starLimit; i++) {
+        const s = stars[i];
+        const sx = s.x * W;
+        const sy = s.y * H;
+        const alpha = Math.round(228 * s.brightness * reveal);
+
+        if (s.type === 'gratitude' || s.style === 'needle') {
+          drawNeedleStar(p, sx, sy, s.size * 5.1, alpha);
+        } else if (s.type === 'guiding' || s.style === 'diamond') {
+          drawDiamondStar(p, sx, sy, s.size * 2.9, alpha);
+        } else if (s.type === 'shooting') {
+          drawSketchTail(p, sx, sy, s.size, alpha);
+          drawNeedleStar(p, sx, sy, s.size * 3.4, alpha);
+        } else if (s.type === 'shadow') {
+          p.noStroke(); p.fill(23,22,20, Math.round(alpha * 0.55));
+          p.ellipse(sx, sy, s.size * 1.2, s.size * 1.2);
+        } else if (s.style === 'handstar') {
+          drawHandStar(p, sx, sy, s.size * 2.1, alpha);
+        } else if (s.style === 'tinyStar') {
+          drawTinyAsterisk(p, sx, sy, s.size * 1.7, alpha);
+        } else {
+          p.noStroke(); p.fill(23,22,20, Math.round(alpha * 0.82));
+          p.ellipse(sx, sy, Math.max(1.8, s.size), Math.max(1.8, s.size));
+        }
+      }
+
+      // Tiny surrounding dots, like the references.
+      const decoRand = mkRand((entry.constellationSeed || entry.id || 'deco') + '_ink_dots');
+      const decoCount = opts.isGalaxy ? 0 : Math.min(10, Math.max(4, Math.round(stars.length * 0.7)));
+      p.noFill();
+      for (let i=0; i<decoCount; i++) {
+        const a = Math.round((40 + decoRand()*70) * reveal);
+        const x = decoRand()*W, y = decoRand()*H;
+        if (decoRand() < 0.52) {
+          p.stroke(23,22,20,a); p.strokeWeight(0.75);
+          p.ellipse(x, y, 2.5 + decoRand()*3.8, 2.5 + decoRand()*3.8);
+        } else {
+          p.noStroke(); p.fill(23,22,20,a);
+          p.ellipse(x, y, 1.2 + decoRand()*1.8, 1.2 + decoRand()*1.8);
+        }
+      }
+
+      if (tags.includes('calm') || tags.includes('peaceful')) {
+        p.noFill(); p.stroke(26,24,22, Math.round(18 * reveal)); p.strokeWeight(0.5);
+        p.beginShape();
+        for(let x2=0;x2<W;x2+=10) p.curveVertex(x2, H*0.91+Math.sin((x2/W)*Math.PI*3)*2.5);
+        p.endShape();
+      }
+
+      if (reveal >= 1 && !opts.animated) p.noLoop();
+    };
+  });
+
+  _sketches[containerId] = sk;
+  return sk;
+}
+
+function drawSketchConnection(p, s1, s2, c, W, H, reveal) {
+  const x1 = s1.x * W, y1 = s1.y * H, x2 = s2.x * W, y2 = s2.y * H;
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len, ny = dx / len;
+  const bow = (c.wobble || 0.02) * Math.min(W,H) * (c.sketch < 0.5 ? -1 : 1);
+  const cx1 = x1 + dx * 0.28 + nx * bow;
+  const cy1 = y1 + dy * 0.28 + ny * bow;
+  const cx2 = x1 + dx * 0.72 - nx * bow * 0.55;
+  const cy2 = y1 + dy * 0.72 - ny * bow * 0.55;
+
+  p.noFill();
+  p.strokeCap(p.ROUND);
+  for (let pass = 0; pass < 2; pass++) {
+    p.stroke(22,21,19, Math.round((c.branch ? 50 : 68) * reveal * (pass ? 0.42 : 1)));
+    p.strokeWeight(pass ? 0.45 : 0.72);
+    p.beginShape();
+    p.vertex(x1, y1);
+    p.bezierVertex(cx1 + pass*1.5, cy1 - pass*0.8, cx2 - pass*1.2, cy2 + pass*1.0, x2, y2);
+    p.endShape();
+  }
+
+  if (c.broken) {
+    p.stroke(251,249,244, 210);
+    p.strokeWeight(2.2);
+    p.line((x1+x2)/2-5, (y1+y2)/2-2, (x1+x2)/2+5, (y1+y2)/2+2);
+  }
+}
+
+function drawInkFlourish(p, f, W, H, reveal, idx) {
+  const x = f.x * W, y = f.y * H, r = f.r * Math.min(W,H);
+  p.push();
+  p.translate(x,y);
+  p.rotate(f.rot);
+  p.noFill();
+  p.strokeCap(p.ROUND);
+  p.stroke(23,22,20, Math.round(54 * f.alpha * reveal));
+  p.strokeWeight(0.58);
+
+  p.beginShape();
+  for (let i = 0; i < 42; i++) {
+    const t = i / 41;
+    const a = f.turn * (0.35 + t * Math.PI * 1.65);
+    const rr = r * (1 - t * 0.72);
+    const px = Math.cos(a) * rr + t * r * 0.92;
+    const py = Math.sin(a) * rr * 0.46;
+    p.curveVertex(px, py);
+  }
+  p.endShape();
+
+  if (idx % 2 === 0) {
+    p.stroke(23,22,20, Math.round(28 * f.alpha * reveal));
+    p.beginShape();
+    for (let i = 0; i < 26; i++) {
+      const t = i / 25;
+      p.curveVertex(t * r * 1.15, Math.sin(t * Math.PI * 1.5) * r * 0.20 - r * 0.16);
+    }
+    p.endShape();
+  }
+  p.pop();
+}
+
+function drawSketchTail(p, x, y, size, alpha) {
+  p.noFill();
+  p.stroke(23,22,20, Math.round(alpha * 0.28));
+  p.strokeWeight(0.62);
+  p.beginShape();
+  p.curveVertex(x + size*1.5, y + size*0.7);
+  p.curveVertex(x + size*1.5, y + size*0.7);
+  p.curveVertex(x + size*6.2, y + size*1.2);
+  p.curveVertex(x + size*8.2, y + size*3.0);
+  p.endShape();
+}
+
+function drawNeedleStar(p, x, y, r, alpha=210) {
+  p.push();
+  p.translate(x,y);
+  p.noFill();
+  p.stroke(19,18,17, Math.min(235, alpha));
+  p.strokeWeight(Math.max(0.72, r*0.035));
+  p.strokeCap(p.ROUND);
+
+  p.line(0, -r, 0, r);
+  p.line(-r*0.62, 0, r*0.62, 0);
+  p.line(-r*0.30, -r*0.30, r*0.30, r*0.30);
+  p.line(r*0.30, -r*0.30, -r*0.30, r*0.30);
+
+  p.stroke(19,18,17, Math.round(alpha*0.65));
+  p.beginShape();
+  p.vertex(0, -r*0.68);
+  p.bezierVertex(r*0.20, -r*0.16, r*0.20, r*0.16, 0, r*0.68);
+  p.bezierVertex(-r*0.20, r*0.16, -r*0.20, -r*0.16, 0, -r*0.68);
+  p.endShape();
+  p.pop();
+}
+
+function drawHandStar(p, x, y, r, alpha=190) {
+  p.push();
+  p.translate(x,y);
+  p.noFill();
+  p.stroke(19,18,17, alpha);
+  p.strokeWeight(Math.max(0.85, r*0.08));
+  p.strokeJoin(p.ROUND);
+  p.strokeCap(p.ROUND);
+  p.beginShape();
+  for (let i=0; i<10; i++) {
+    const a = -Math.PI/2 + i * Math.PI/5;
+    const rr = i % 2 === 0 ? r : r * 0.42;
+    p.vertex(Math.cos(a) * rr, Math.sin(a) * rr);
+  }
+  p.close();
+  p.endShape();
+
+  // Slight second-pass imperfection for the sketched look.
+  p.stroke(19,18,17, Math.round(alpha * 0.30));
+  p.beginShape();
+  for (let i=0; i<10; i++) {
+    const a = -Math.PI/2 + i * Math.PI/5 + 0.035;
+    const rr = (i % 2 === 0 ? r : r * 0.42) * 0.96;
+    p.vertex(Math.cos(a) * rr + 0.7, Math.sin(a) * rr - 0.5);
+  }
+  p.close();
+  p.endShape();
+  p.pop();
+}
+
+function drawTinyAsterisk(p, x, y, r, alpha=185) {
+  p.push();
+  p.translate(x,y);
+  p.stroke(19,18,17, alpha);
+  p.strokeWeight(Math.max(0.72, r*0.08));
+  p.strokeCap(p.ROUND);
+  for (let a of [0, Math.PI/3, Math.PI*2/3]) {
+    p.line(Math.cos(a)*-r, Math.sin(a)*-r, Math.cos(a)*r, Math.sin(a)*r);
+  }
+  p.pop();
+}
+
+function drawDiamondStar(p, x, y, r, alpha=190) {
+  p.push();
+  p.translate(x,y);
+  p.noFill();
+  p.stroke(20,19,18, alpha);
+  p.strokeWeight(Math.max(0.75, r*0.055));
+  p.strokeCap(p.ROUND);
+  p.strokeJoin(p.ROUND);
+  p.beginShape();
+  p.vertex(0,-r);
+  p.bezierVertex(r*0.34,-r*0.18,r*0.34,r*0.18,0,r);
+  p.bezierVertex(-r*0.34,r*0.18,-r*0.34,-r*0.18,0,-r);
+  p.endShape();
+  p.pop();
+}
+
+function drawPlusSparkle(p, x, y, r, alpha=185) {
+  p.push();
+  p.translate(x,y);
+  p.stroke(20,19,18, alpha);
+  p.strokeWeight(Math.max(0.75, r*0.085));
+  p.strokeCap(p.ROUND);
+  p.line(-r,0,-r*0.36,0); p.line(r*0.36,0,r,0);
+  p.line(0,-r,0,-r*0.36); p.line(0,r*0.36,0,r);
+  p.pop();
+}
+
+// ══════════════════════════════════════════════════
+//  FORM INTERACTIONS
+// ══════════════════════════════════════════════════
+let selectedMood = '';
+let selectedTags = [];
+
+document.querySelectorAll('.mood-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mood-chip').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedMood = btn.dataset.mood;
+  });
+});
+
+document.getElementById('energy-slider').addEventListener('input', e => {
+  document.getElementById('energy-val').textContent = e.target.value;
+});
+
+document.querySelectorAll('.tag-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('selected');
+    const tag = btn.dataset.tag;
+    selectedTags = selectedTags.includes(tag)
+      ? selectedTags.filter(t => t !== tag)
+      : [...selectedTags, tag];
+    });
+});
+
+// ══════════════════════════════════════════════════
+//  SUBMIT
+// ══════════════════════════════════════════════════
+let lastSavedEntryId = null;
+
+function submitEntry() {
+  if (!selectedMood) { alert('Please choose a mood to draw your constellation ✦'); return; }
+  const dt = getNow();
+  const seed = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  const entry = {
+    id: seed, constellationSeed: seed,
+    createdAt: new Date().toISOString(), dt,
+    date:dt.date, time:dt.time, dayOfWeek:dt.dayOfWeek,
+    month:dt.month, year:dt.year,
+    mood: selectedMood,
+    energy: parseInt(document.getElementById('energy-slider').value),
+    gratitude: document.getElementById('gratitude').value.trim(),
+    hardThing: document.getElementById('hard-thing').value.trim(),
+    tinyWin: document.getElementById('tiny-win').value.trim(),
+    tomorrow: document.getElementById('tomorrow').value.trim(),
+    tags: [...selectedTags],
+    symbolicMeaning: getSymbolicMeaning(selectedMood)
+  };
+  addEntry(entry);
+  lastSavedEntryId = entry.id;
+  showSuccessScreen(entry);
+}
+
+function getSymbolicMeaning(mood) {
+  const m = {
+    glowing:'a radiant bloom of light', steady:'a grounded arc of certainty',
+    cloudy:'a gentle diffuse cluster', heavy:'a dense lower constellation',
+    scattered:'a scattered field of sparks', tender:'a soft open curve',
+    hopeful:'an ascending trail of stars', overwhelmed:'a wide scattered burst',
+    peaceful:'a flowing wave of light', excited:'an explosive radiant burst'
+  };
+  return { overallShape: m[mood] || 'a quiet personal constellation' };
+}
+
+// ══════════════════════════════════════════════════
+//  SUCCESS SCREEN
+// ══════════════════════════════════════════════════
+const SUCCESS_MSGS = [
+  'Your feelings became part of the sky Tonight.',
+  'Every day leaves a little light behind.',
+  'Your mood became a constellation.',
+  'A new star map drawn just for Tonight.'
+];
+let successP5 = null;
+
+function showSuccessScreen(entry) {
+  const screen = document.getElementById('success-screen');
+  screen.classList.add('show');
+  document.getElementById('success-message').textContent = SUCCESS_MSGS[Math.floor(Math.random()*SUCCESS_MSGS.length)];
+  const successWrap = document.getElementById('success-canvas-wrap');
+  successWrap.innerHTML = '';
+  successWrap.classList.remove('revealing');
+  destroySketch('success-canvas-wrap');
+  // Slight delay so DOM is painted before p5 measures size
+  setTimeout(() => {
+    successWrap.classList.add('revealing');
+    renderConstellation('success-canvas-wrap', entry, { reveal:true });
+  }, 80);
+  resetForm();
+}
+
+function closeSuccess() {
+  document.getElementById('success-screen').classList.remove('show');
+  destroySketch('success-canvas-wrap');
+}
+
+function viewNewDetail() {
+  closeSuccess();
+  if (lastSavedEntryId) openSavedConstellation(lastSavedEntryId);
+}
+
+function resetForm() {
+  selectedMood=''; selectedTags=[];
+  document.querySelectorAll('.mood-chip').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.tag-chip').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('energy-slider').value=3;
+  document.getElementById('energy-val').textContent='3';
+  ['gratitude','hard-thing','tiny-win','tomorrow'].forEach(id=>{ document.getElementById(id).value=''; });
+}
+
+// ══════════════════════════════════════════════════
+//  GALAXY
+// ══════════════════════════════════════════════════
+let GalaxyP5 = null;
+
+function renderGalaxyFallback(container, entries) {
+  const overlay = container.querySelector('.Galaxy-overlay')?.outerHTML || '';
+  const tooltip = container.querySelector('#entry-tooltip')?.outerHTML || '';
+  const hint = container.querySelector('.Galaxy-hint')?.outerHTML || '';
+  if (!entries.length) {
+    container.innerHTML = `${overlay}${tooltip}<div class="Galaxy-fallback interactive"><div class="empty-Journal" style="max-width:420px;margin:5rem auto;text-align:center"><div class="doodle-stars">· ✦ · ✧ · ✦ ·</div><p style="margin-top:1rem">Your Galaxy is waiting. Begin Tonight.</p></div></div>${hint}`;
+    return;
+  }
+  container.innerHTML = `${overlay}${tooltip}<div class="Galaxy-fallback interactive"><div class="Galaxy-fallback-grid">${
+    entries.map(entry => `
+      <button type="button" class="Galaxy-fallback-card" data-entry-id="${escapeHTML(entry.id)}">
+        <p class="card-date">${escapeHTML(entry.dt ? entry.dt.display : entry.date || '')}</p>
+        <p class="card-mood">✦ ${escapeHTML(entry.mood || '')}</p>
+        <div class="Galaxy-mini-svg">${constellationSVGMarkup(generateConstellationData(entry), 220, 92, { mini:true })}</div>
+        <p class="card-snippet">${entry.gratitude ? '&quot;' + escapeHTML(entry.gratitude).slice(0,54) + (entry.gratitude.length>54?'…':'') + '&quot;' : ''}</p>
+      </button>`).join('')
+  }</div></div>${hint}`;
+  container.querySelectorAll('.Galaxy-fallback-card').forEach(card => {
+    card.addEventListener('click', () => openSavedConstellation(card.dataset.entryId));
+  });
+}
+
+function initGalaxy() {
+  const container = document.getElementById('Galaxy-canvas-wrap');
+  if (!container) return;
+  destroySketch('Galaxy-p5');
+  if (GalaxyP5) { GalaxyP5.remove(); GalaxyP5 = null; }
+
+  const entries = loadEntries();
+  const rand0 = mkRand('InteractiveGalaxy2026');
+
+  if (typeof p5 === 'undefined') {
+    renderGalaxyFallback(container, entries);
+    return;
+  }
+
+  GalaxyP5 = new p5(function(p) {
+    let t = 0;
+    let camX = 0, camY = 0, targetCamX = 0, targetCamY = 0;
+    let zoom = 1, targetZoom = 1;
+    let dragging = false, dragStartX = 0, dragStartY = 0, lastX = 0, lastY = 0;
+    let nodes = [], bgStars = [], dust = [], hoverIdx = -1, pressedIdx = -1, openPulse = null, pendingGalaxyOpenId = null;
+
+    const moodPalette = {
+      calm: [190, 204, 255],
+      happy: [255, 219, 140],
+      joyful: [255, 219, 140],
+      anxious: [210, 185, 255],
+      sad: [164, 190, 226],
+      tired: [195, 200, 210],
+      angry: [255, 160, 130],
+      grateful: [225, 210, 155],
+      brave: [255, 198, 150],
+      soft: [232, 201, 201]
+    };
+
+    function entryColor(entry) {
+      const key = String(entry.mood || '').toLowerCase();
+      for (const k in moodPalette) if (key.includes(k)) return moodPalette[k];
+      return [232, 213, 160];
+    }
+
+    function worldFromMouse() {
+      return {
+        x: (p.mouseX - p.width / 2) / zoom - camX,
+        y: (p.mouseY - p.height / 2) / zoom - camY
+      };
+    }
+
+    p.setup = function() {
+      const cnv = p.createCanvas(container.offsetWidth, container.offsetHeight);
+      cnv.parent('Galaxy-canvas-wrap');
+      cnv.id('Galaxy-p5');
+      cnv.style('display', 'block');
+
+      const count = Math.max(entries.length, 1);
+      entries.forEach((entry, i) => {
+        const ring = Math.floor(i / 7);
+        const angle = (i * 2.3999632297) + rand0() * 0.45;
+        const radius = 95 + ring * 118 + (i % 7) * 13 + rand0() * 35;
+        const energy = Number(entry.energy || 3);
+        const data = generateConstellationData(entry);
+        nodes.push({
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius * 0.68,
+          baseX: Math.cos(angle) * radius,
+          baseY: Math.sin(angle) * radius * 0.68,
+          entry,
+          data,
+          color: entryColor(entry),
+          size: 34 + energy * 7,
+          phase: rand0() * Math.PI * 2
+        });
+      });
+
+      for (let i = 0; i < 360; i++) {
+        bgStars.push({
+          x: (rand0() - 0.5) * 2600,
+          y: (rand0() - 0.5) * 1800,
+          z: 0.35 + rand0() * 1.25,
+          tw: rand0() * Math.PI * 2
+        });
+      }
+
+      for (let i = 0; i < 44; i++) {
+        dust.push({
+          x: (rand0() - 0.5) * 1800,
+          y: (rand0() - 0.5) * 1200,
+          r: 45 + rand0() * 125,
+          a: 7 + rand0() * 14,
+          drift: rand0() * Math.PI * 2
+        });
+      }
+    };
+
+    p.windowResized = function() {
+      p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+    };
+
+    p.mouseWheel = function(e) {
+      targetZoom = Math.max(0.42, Math.min(3.2, targetZoom - e.delta * 0.0012));
+      return false;
+    };
+
+    p.mousePressed = function() {
+      dragging = true;
+      dragStartX = p.mouseX; dragStartY = p.mouseY;
+      lastX = p.mouseX; lastY = p.mouseY;
+      pressedIdx = hoverIdx;
+      container.style.cursor = 'grabbing';
+    };
+
+    p.mouseDragged = function() {
+      if (!dragging) return;
+      targetCamX += (p.mouseX - lastX) / zoom;
+      targetCamY += (p.mouseY - lastY) / zoom;
+      lastX = p.mouseX; lastY = p.mouseY;
+    };
+
+    function findGalaxyNodeUnderMouse() {
+      const m = worldFromMouse();
+      let bestIdx = -1;
+      let bestDist = Infinity;
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        const hitRadius = Math.max(54, n.size * 1.15);
+        const dist = Math.hypot(m.x - n.x, m.y - n.y);
+        if (dist < hitRadius && dist < bestDist) {
+          bestDist = dist;
+          bestIdx = i;
+        }
+      }
+      return bestIdx;
+    }
+
+    function openGalaxyNode(index) {
+      if (index < 0 || !nodes[index]) return;
+      const n = nodes[index];
+      const id = String(n.entry.id);
+
+      targetZoom = Math.max(1.45, Math.min(2.45, targetZoom + 0.55));
+      targetCamX = -n.x;
+      targetCamY = -n.y;
+      openPulse = { x:n.x, y:n.y, age:0, entryId:id };
+      pendingGalaxyOpenId = id;
+
+      // Open the day preview reliably even if the animation loop is interrupted.
+      window.setTimeout(() => {
+        if (pendingGalaxyOpenId === id) {
+          pendingGalaxyOpenId = null;
+          openPulse = null;
+          openSavedConstellation(id);
+        }
+      }, 260);
+    }
+
+    p.mouseReleased = function() {
+      const click = Math.abs(p.mouseX - dragStartX) < 10 && Math.abs(p.mouseY - dragStartY) < 10;
+      const targetIdx = hoverIdx >= 0 ? hoverIdx : findGalaxyNodeUnderMouse();
+
+      if (click && targetIdx >= 0 && (pressedIdx === targetIdx || pressedIdx === -1 || hoverIdx === targetIdx)) {
+        openGalaxyNode(targetIdx);
+      }
+
+      dragging = false;
+      pressedIdx = -1;
+      container.style.cursor = hoverIdx >= 0 ? 'pointer' : 'grab';
+    };
+
+    function drawBackground() {
+      const g = p.drawingContext.createRadialGradient(p.width * .50, p.height * .42, 20, p.width * .50, p.height * .42, Math.max(p.width, p.height) * .72);
+      g.addColorStop(0, '#25233a');
+      g.addColorStop(.45, '#171629');
+      g.addColorStop(1, '#0f1321');
+      p.drawingContext.fillStyle = g;
+      p.rect(0, 0, p.width, p.height);
+
+      p.push();
+      p.translate(p.width/2 + camX * zoom * .18, p.height/2 + camY * zoom * .18);
+      p.noStroke();
+      for (const d of dust) {
+        const pulse = 0.75 + Math.sin(t * .35 + d.drift) * .25;
+        p.fill(122, 114, 160, d.a * pulse);
+        p.ellipse(d.x * .35, d.y * .35, d.r, d.r * .55);
+        p.fill(201, 168, 76, d.a * .35 * pulse);
+        p.ellipse(d.x * .22, d.y * .22, d.r * .55, d.r * .25);
+      }
+      p.pop();
+    }
+
+    function drawSparkle(x, y, r, alpha, col) {
+      p.stroke(col[0], col[1], col[2], alpha);
+      p.strokeWeight(Math.max(.55, r * .08));
+      p.line(x - r, y, x + r, y);
+      p.line(x, y - r, x, y + r);
+      p.line(x - r * .45, y - r * .45, x + r * .45, y + r * .45);
+      p.line(x - r * .45, y + r * .45, x + r * .45, y - r * .45);
+    }
+
+    function drawNode(n, i, hovered) {
+      const breathe = Math.sin(t * 1.15 + n.phase);
+      const sc = n.size * (hovered ? 1.18 : 1) * (1 + breathe * .015);
+      const col = n.color;
+
+      n.x = n.baseX + Math.sin(t * .5 + n.phase) * 3.4;
+      n.y = n.baseY + Math.cos(t * .42 + n.phase) * 2.4;
+
+      p.noStroke();
+      if (hovered) {
+        p.fill(col[0], col[1], col[2], 26);
+        p.ellipse(n.x, n.y, sc * 2.9, sc * 2.9);
+        p.fill(col[0], col[1], col[2], 13);
+        p.ellipse(n.x, n.y, sc * 4.2, sc * 4.2);
+      } else {
+        p.fill(col[0], col[1], col[2], 9);
+        p.ellipse(n.x, n.y, sc * 2.4, sc * 2.4);
+      }
+
+      const d = n.data;
+      p.stroke(col[0], col[1], col[2], hovered ? 116 : 68);
+      p.strokeWeight(hovered ? .95 : .55);
+      p.noFill();
+      for (const c of d.connections.slice(0, hovered ? 9 : 6)) {
+        if (c.from >= d.stars.length || c.to >= d.stars.length) continue;
+        const s1 = d.stars[c.from], s2 = d.stars[c.to];
+        const x1 = n.x + s1.x * sc - sc/2;
+        const y1 = n.y + s1.y * sc - sc/2;
+        const x2 = n.x + s2.x * sc - sc/2;
+        const y2 = n.y + s2.y * sc - sc/2;
+        const mx = (x1 + x2) / 2 + Math.sin(i + c.from) * 4;
+        const my = (y1 + y2) / 2 + Math.cos(i + c.to) * 4;
+        p.bezier(x1, y1, mx, my, mx, my, x2, y2);
+      }
+
+      for (let si = 0; si < Math.min(d.stars.length, hovered ? 14 : 10); si++) {
+        const s = d.stars[si];
+        const sx = n.x + s.x * sc - sc/2;
+        const sy = n.y + s.y * sc - sc/2;
+        const tw = 0.7 + Math.sin(t * 2.2 + s.x * 11 + n.phase) * .22;
+        const rr = Math.max(1.2, s.size * (hovered ? .82 : .62) * tw);
+        p.noStroke();
+        p.fill(250, 247, 240, hovered ? 230 : 185);
+        p.ellipse(sx, sy, rr, rr);
+        if (si < 5 || hovered) drawSparkle(sx, sy, rr * (hovered ? 3.4 : 2.3), hovered ? 118 : 72, col);
+      }
+
+      if (hovered) {
+        p.noStroke();
+        p.fill(250,247,240,215);
+        p.textAlign(p.CENTER);
+        p.textSize(10 / Math.max(.85, zoom));
+        p.textStyle(p.ITALIC);
+        p.text(n.entry.mood || 'constellation', n.x, n.y + sc * .92);
+      }
+    }
+
+    p.draw = function() {
+      t += 0.012;
+      camX += (targetCamX - camX) * .09;
+      camY += (targetCamY - camY) * .09;
+      zoom += (targetZoom - zoom) * .09;
+
+      drawBackground();
+
+      p.push();
+      p.translate(p.width/2 + camX * zoom, p.height/2 + camY * zoom);
+      p.scale(zoom);
+
+      p.noStroke();
+      for (const b of bgStars) {
+        const shimmer = 0.55 + Math.sin(t * b.z + b.tw) * .3;
+        p.fill(250, 247, 240, 58 * shimmer * b.z);
+        p.ellipse(b.x, b.y, Math.max(.6, b.z * 1.15), Math.max(.6, b.z * 1.15));
+      }
+
+      hoverIdx = -1;
+      const m = worldFromMouse();
+
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        const hit = Math.hypot(m.x - n.x, m.y - n.y);
+        if (hit < Math.max(42, n.size * .95)) hoverIdx = i;
+      }
+
+      p.stroke(250, 247, 240, 18);
+      p.strokeWeight(.45);
+      for (let i = 1; i < nodes.length; i++) {
+        const a = nodes[i - 1], b = nodes[i];
+        p.line(a.x, a.y, b.x, b.y);
+      }
+
+      nodes.forEach((n, i) => drawNode(n, i, i === hoverIdx));
+
+      if (openPulse) {
+        openPulse.age += .045;
+        const a = Math.max(0, 1 - openPulse.age);
+        p.noFill();
+        p.stroke(250,247,240, 190 * a);
+        p.strokeWeight(1.4);
+        p.ellipse(openPulse.x, openPulse.y, 40 + openPulse.age * 120, 40 + openPulse.age * 120);
+        if (openPulse.age > .62) {
+          const id = String(openPulse.entryId);
+          openPulse = null;
+          if (pendingGalaxyOpenId === id) {
+            pendingGalaxyOpenId = null;
+            openSavedConstellation(id);
+          }
+        }
+      }
+
+      p.pop();
+
+      const tt = document.getElementById('entry-tooltip');
+      if (hoverIdx >= 0 && nodes[hoverIdx]) {
+        const e = nodes[hoverIdx].entry;
+        document.getElementById('tt-date').textContent = e.dt ? e.dt.display : e.date;
+        document.getElementById('tt-mood').textContent = '✦ ' + (e.mood || 'constellation');
+        document.getElementById('tt-snippet').textContent = e.gratitude ? '"' + e.gratitude.slice(0,48) + (e.gratitude.length > 48 ? '…' : '') + '"' : 'click to open this day';
+        tt.style.display = 'block';
+        tt.style.left = Math.min(p.width - 190, p.mouseX + 14) + 'px';
+        tt.style.top = Math.max(70, p.mouseY - 18) + 'px';
+        container.style.cursor = dragging ? 'grabbing' : 'pointer';
+      } else {
+        if (tt) tt.style.display = 'none';
+        container.style.cursor = dragging ? 'grabbing' : 'grab';
+      }
+
+      if (entries.length === 0) {
+        p.noStroke();
+        p.fill(250,247,240,170);
+        p.textAlign(p.CENTER);
+        p.textSize(15);
+        p.textStyle(p.ITALIC);
+        p.text('Your Galaxy is waiting.\nBegin Tonight.', p.width/2, p.height/2);
+      }
+    };
+  });
+}
+
+
+// ══════════════════════════════════════════════════
+//  JOURNAL
+// ══════════════════════════════════════════════════
+function safeDomId(value) {
+  return String(value ?? '').replace(/[^a-zA-Z0-9_-]/g, '_');
+}
+
+function renderJournal() {
+  const entries=loadEntries();
+  const grid=document.getElementById('Journal-grid');
+  const cnt=document.getElementById('Journal-count');
+  cnt.textContent=entries.length===0
+    ? 'No constellations yet — begin Tonight.'
+    : `${entries.length} constellation${entries.length===1?'':'s'} in your sky`;
+
+  if(entries.length===0){
+    grid.innerHTML='<div class="empty-Journal"><div class="doodle-stars">· ✦ · ✧ · ✦ ·</div><p style="margin-top:1rem">Your first constellation is waiting to be drawn.</p></div>';
+    return;
+  }
+
+  grid.innerHTML='';
+  entries.forEach((entry, index) => {
+    const card=document.createElement('button');
+    card.type='button';
+    card.className='Journal-card fade-in';
+    card.dataset.entryId = String(entry.id);
+    card.dataset.entryIndex = String(index);
+    const miniId = 'mini-' + safeDomId(entry.id);
+    const tagsH=(entry.tags||[]).slice(0,3).map(t=>`<span class="card-tag">${escapeHTML(t)}</span>`).join('');
+
+    card.innerHTML=`
+      <p class="card-date">${escapeHTML(entry.dt?entry.dt.display:entry.date||'')} · ${escapeHTML(entry.time||'')}</p>
+      <p class="card-mood">✦ ${escapeHTML(entry.mood||'')}</p>
+      <div class="card-mini-wrap" id="${miniId}"></div>
+      <p class="card-snippet">${entry.gratitude?'&quot;'+escapeHTML(entry.gratitude).slice(0,65)+(entry.gratitude.length>65?'…':'')+'&quot;':''}</p>
+      <div class="card-tags">${tagsH}</div>`;
+
+    card.onclick=(event)=>{
+      event.preventDefault();
+      event.stopPropagation();
+      openJournalCard(card);
+    };
+
+    grid.appendChild(card);
+
+    setTimeout(()=>{
+      const wrap=document.getElementById(miniId);
+      if(!wrap) return;
+      wrap.innerHTML='';
+      if (typeof p5 === 'undefined') {
+        wrap.innerHTML = constellationSVGMarkup(generateConstellationData(entry), wrap.offsetWidth || 220, 100, { mini:true });
+        return;
+      }
+      const sk=new p5(function(p){
+        p.setup=function(){
+          const w=wrap.offsetWidth||220, h=100;
+          const cnv=p.createCanvas(w,h); cnv.parent(miniId);
+          cnv.style('display','block'); p.noLoop();
+        };
+        p.draw=function(){
+          const W=p.width, H=p.height;
+          const d=generateConstellationData(entry);
+          p.background(220,214,204);
+          p.stroke(42,37,32,65); p.strokeWeight(0.45);
+          for(const c of d.connections.slice(0,6)){
+            if(c.from>=d.stars.length||c.to>=d.stars.length) continue;
+            p.line(d.stars[c.from].x*W, d.stars[c.from].y*H, d.stars[c.to].x*W, d.stars[c.to].y*H);
+          }
+          p.noStroke();
+          for(const s of d.stars.slice(0,12)){
+            p.fill(s.type==='gratitude'?p.color(201,168,76,190):p.color(42,37,32,Math.round(s.brightness*170)));
+            p.ellipse(s.x*W, s.y*H, Math.max(1,s.size*0.7), Math.max(1,s.size*0.7));
+          }
+        };
+      });
+    }, 60);
+  });
+}
+
+function openJournalCard(card) {
+  const entries = loadEntries();
+  const index = Number(card.dataset.entryIndex);
+  const byIndex = Number.isInteger(index) ? entries[index] : null;
+  const byId = findEntryById(card.dataset.entryId);
+  const entry = byIndex && String(byIndex.id) === String(card.dataset.entryId) ? byIndex : byId;
+  if (!entry) {
+    notify('That constellation could not be found. Try refreshing the Journal ✦');
+    return;
+  }
+  openDetail(entry.id);
+}
+
+// Extra-safe Journal click handling: tapping anywhere on a saved constellation card opens its day.
+document.addEventListener('click', function(e) {
+  const card = e.target.closest && e.target.closest('.Journal-card');
+  if (!card || !card.dataset.entryId) return;
+  openJournalCard(card);
+});
+
+document.addEventListener('click', function(e) {
+  const card = e.target.closest && e.target.closest('.Galaxy-fallback-card');
+  if (!card || !card.dataset.entryId) return;
+  openSavedConstellation(card.dataset.entryId);
+});
+
+
+
+// Robust saved-constellation lookup: ids from local storage/cloud can be strings or numbers.
+function findEntryById(id) {
+  const wanted = String(id ?? '');
+  return loadEntries().find(entry => String(entry.id ?? '') === wanted);
+}
+
+function openSavedConstellation(id) {
+  const entry = findEntryById(id);
+  if (!entry) {
+    notify('That constellation is still syncing. Please try again in a moment ✦');
+    return;
+  }
+  openDetail(entry.id);
+}
+
+// ══════════════════════════════════════════════════
+//  DETAIL
+// ══════════════════════════════════════════════════
+let currentDetailId=null;
+let detailRenderToken = 0;
+
+function openDetail(id) {
+  const entry=findEntryById(id);
+  if(!entry) {
+    notify('That constellation is still syncing. Please try again in a moment ✦');
+    return;
+  }
+  currentDetailId=entry.id;
+  const thisRender = ++detailRenderToken;
+
+  // Switch pages first so the canvas has a real width/height before p5 measures it.
+  showPage('detail');
+
+  document.getElementById('detail-date').textContent=(entry.dt?entry.dt.display:entry.date)+' · '+(entry.time||'');
+  document.getElementById('detail-mood-title').textContent='✦ '+entry.mood;
+
+  const detailWrap = document.getElementById('detail-canvas-wrap');
+  detailWrap.innerHTML='';
+  detailWrap.classList.remove('revealing');
+  destroySketch('detail-canvas-wrap');
+
+  // Show a dependable SVG immediately so the preview never appears as a blank block.
+  detailWrap.innerHTML = constellationSVGMarkup(generateConstellationData(entry), detailWrap.clientWidth || 620, detailWrap.clientHeight || 340, { reveal:true });
+  detailWrap.classList.add('revealing');
+
+  setTimeout(() => {
+    if (thisRender !== detailRenderToken || String(currentDetailId) !== String(entry.id)) return;
+    renderConstellation('detail-canvas-wrap', entry, { reveal:true, animated:true });
+  }, 160);
+
+  const syms=[];
+  if(entry.gratitude) syms.push({i:'✦',t:`Your gratitude became the brightest star: "${escapeHTML(entry.gratitude).slice(0,60)}"`});
+  if(entry.hardThing) syms.push({i:'·',t:`Your hard thing became the fractured line: "${escapeHTML(entry.hardThing).slice(0,60)}"`});
+  if(entry.tinyWin) syms.push({i:'→',t:`Your tiny win became a shooting star: "${escapeHTML(entry.tinyWin).slice(0,60)}"`});
+  if(entry.tomorrow) syms.push({i:'↑',t:`Your hope for tomorrow became the guiding star: "${escapeHTML(entry.tomorrow).slice(0,60)}"`});
+  syms.push({i:'∿',t:entry.symbolicMeaning?.overallShape||'a quiet personal constellation'});
+
+  document.getElementById('symbolic-legend').innerHTML='<h3>what your constellation holds</h3>'+
+    syms.map(s=>`<div class="sym-row"><span class="sym-icon">${escapeHTML(s.i)}</span><span class="sym-text">${s.t}</span></div>`).join('');
+
+  const qa=[
+    {q:'mood',a:entry.mood},{q:'energy',a:'⌁'.repeat(entry.energy||3)+' ('+(entry.energy||3)+'/5)'},
+    {q:'grateful for',a:entry.gratitude},{q:'what felt hard',a:entry.hardThing},
+    {q:'tiny win',a:entry.tinyWin},{q:'carrying into tomorrow',a:entry.tomorrow},
+    {q:'tags',a:(entry.tags||[]).join(' · ')}
+  ].filter(x=>x.a);
+
+  document.getElementById('detail-content').innerHTML=
+    qa.map(x=>`<div class="detail-section"><p class="detail-q">${escapeHTML(x.q)}</p><p class="detail-a">${escapeHTML(x.a)}</p></div>`).join('');
+
+  document.getElementById('detail-blurb').textContent=BLURBS[Math.floor(Math.random()*BLURBS.length)];
+}
+
+function deleteEntry() {
+  if(!currentDetailId) return;
+  if(confirm('Remove this constellation from your sky?')) {
+    deleteEntryById(currentDetailId);
+    destroySketch('detail-canvas-wrap');
+    showPage('Journal');
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  AI INSIGHTS
+// ══════════════════════════════════════════════════
+let InsightsState = { narrative: null, weekly: null, patterns: null };
+
+function renderInsightsPage() {
+  const entries = loadEntries();
+  const body = document.getElementById('Insights-body');
+
+  if (entries.length === 0) {
+    body.innerHTML = `<div class="no-data-msg">
+      <div class="doodle-stars">· ✦ · ✧ · ✦ ·</div>
+      <p style="margin-top:1.5rem">Your first few constellations will reveal the patterns in your sky.</p>
+      <p style="margin-top:0.5rem">Begin checking in Tonight.</p>
+    </div>`;
+    return;
+  }
+
+  // Build stats
+  const moodCounts = {};
+  const energySums = {}, energyCounts = {};
+  let totalEnergy = 0;
+  entries.forEach(e => {
+    moodCounts[e.mood] = (moodCounts[e.mood]||0)+1;
+    energySums[e.mood] = (energySums[e.mood]||0) + (e.energy||3);
+    energyCounts[e.mood] = (energyCounts[e.mood]||0)+1;
+    totalEnergy += (e.energy||3);
+  });
+  const topMood = Object.entries(moodCounts).sort((a,b)=>b[1]-a[1])[0];
+  const avgEnergy = (totalEnergy/entries.length).toFixed(1);
+  const streak = calcStreak(entries);
+  const recent7 = entries.slice(0,7);
+  const tagFreq = {};
+  entries.forEach(e=>(e.tags||[]).forEach(t=>{ tagFreq[t]=(tagFreq[t]||0)+1; }));
+  const topTags = Object.entries(tagFreq).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const moodList = Object.entries(moodCounts).sort((a,b)=>b[1]-a[1]);
+  const maxMoodCount = moodList[0]?.[1]||1;
+
+  // Energy sparkline data
+  const energyBars = entries.slice(0,14).reverse().map(e=>({
+    val:e.energy||3,
+    date:(e.dt?e.dt.dayOfWeek:e.dayOfWeek||'').slice(0,3)
+  }));
+
+  body.innerHTML = `
+    <!-- stat cards -->
+    <div class="Insights-grid">
+      <div class="stat-card">
+        <p class="stat-label">total constellations</p>
+        <p class="stat-val">${entries.length}</p>
+        <p class="stat-sub">days recorded</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">most frequent mood</p>
+        <p class="stat-val">${escapeHTML(topMood?.[0]||'—')}</p>
+        <p class="stat-sub">${topMood?.[1]||0} times</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">avg energy</p>
+        <p class="stat-val">${avgEnergy}</p>
+        <p class="stat-sub">out of 5</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">current streak</p>
+        <p class="stat-val">${streak}</p>
+        <p class="stat-sub">day${streak===1?'':'s'}</p>
+      </div>
+    </div>
+
+    <!-- mood frequency -->
+    <div class="Insights-section">
+      <p class="Insights-section-title">mood frequency</p>
+      ${moodList.map(([mood,count])=>`
+        <div class="mood-bar-wrap">
+          <div class="mood-bar-label"><span>${escapeHTML(mood)}</span><span>${count}</span></div>
+          <div class="mood-bar-track"><div class="mood-bar-fill" style="width:${Math.round(count/maxMoodCount*100)}%"></div></div>
+        </div>`).join('')}
+    </div>
+
+    <!-- energy chart -->
+    ${energyBars.length > 1 ? `
+    <div class="Insights-section">
+      <p class="Insights-section-title">energy over time <span style="font-size:0.75rem;color:var(--ink-faint)">(last ${energyBars.length} entries)</span></p>
+      <div class="energy-chart">
+        ${energyBars.map(b=>`
+          <div class="energy-bar-col">
+            <div class="energy-bar" style="height:${Math.round(b.val/5*100)}%"></div>
+            <div class="energy-bar-date">${b.date}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- top tags -->
+    ${topTags.length > 0 ? `
+    <div class="Insights-section">
+      <p class="Insights-section-title">recurring feelings</p>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+        ${topTags.map(([tag,cnt])=>`<span class="card-tag" style="font-size:0.8rem;padding:0.25rem 0.7rem">${escapeHTML(tag)} <span style="opacity:0.6">×${cnt}</span></span>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- theme snapshot -->
+    <div class="Insights-section">
+      <p class="Insights-section-title">explore your themes</p>
+      <div class="theme-map-grid">
+        ${buildThemeCards(entries)}
+      </div>
+    </div>
+
+    <hr class="section-rule">
+
+    <!-- AI narrative -->
+    <div class="Insights-section">
+      <p class="Insights-section-title">sky reading — your personal narrative</p>
+      <div class="ai-card" id="ai-narrative-card">
+        <div class="ai-card-label">guided Insight</div>
+        <div class="ai-response" id="ai-narrative-text">${
+          InsightsState.narrative
+            ? InsightsState.narrative
+            : '<span style="color:var(--ink-faint);font-style:italic">Ask the stars what your recent entries reveal about you. This works right here in your app, with no API error.</span>'
+        }</div>
+      </div>
+      <button class="generate-btn" id="btn-narrative" onclick="generateInsight('narrative')">
+        ${InsightsState.narrative ? 'refresh reading' : 'read my sky ✦'}
+      </button>
+    </div>
+
+    <!-- AI weekly -->
+    <div class="Insights-section">
+      <p class="Insights-section-title">weekly rhythm</p>
+      <div class="ai-card" id="ai-weekly-card">
+        <div class="ai-card-label">guided Insight</div>
+        <div class="ai-response" id="ai-weekly-text">${
+          InsightsState.weekly
+            ? InsightsState.weekly
+            : '<span style="color:var(--ink-faint);font-style:italic">Discover patterns in how your days of the week tend to feel…</span>'
+        }</div>
+      </div>
+      <button class="generate-btn-outline" id="btn-weekly" onclick="generateInsight('weekly')">
+        ${InsightsState.weekly ? 'refresh' : 'find weekly patterns'}
+      </button>
+    </div>
+
+    <!-- AI growth -->
+    <div class="Insights-section">
+      <p class="Insights-section-title">growth & themes</p>
+      <div class="ai-card" id="ai-patterns-card">
+        <div class="ai-card-label">guided Insight</div>
+        <div class="ai-response" id="ai-patterns-text">${
+          InsightsState.patterns
+            ? InsightsState.patterns
+            : '<span style="color:var(--ink-faint);font-style:italic">Tap below to explore your themes. This now works even with your first constellation.</span>'
+        }</div>
+      </div>
+      <button class="generate-btn-outline" id="btn-patterns" onclick="generateInsight('patterns')">
+        ${InsightsState.patterns ? 'refresh' : 'explore your themes'}
+      </button>
+    </div>
+  `;
+}
+
+function calcStreak(entries) {
+  if (!entries.length) return 0;
+  const dates = entries.map(e=>e.date).sort((a,b)=>b.localeCompare(a));
+  const today = new Date().toISOString().split('T')[0];
+  let streak = 0, cur = today;
+  for (const d of dates) {
+    if (d === cur) { streak++; const dt=new Date(cur); dt.setDate(dt.getDate()-1); cur=dt.toISOString().split('T')[0]; }
+    else if (d < cur) break;
+  }
+  return streak;
+}
+
+function buildEntrySummary(entries) {
+  return entries.map(e => {
+    const parts = [];
+    parts.push(`Date: ${e.dt ? e.dt.display : e.date}`);
+    parts.push(`Mood: ${e.mood}`);
+    parts.push(`Energy: ${e.energy}/5`);
+    if (e.gratitude)  parts.push(`Grateful for: ${e.gratitude}`);
+    if (e.hardThing)  parts.push(`Hard thing: ${e.hardThing}`);
+    if (e.tinyWin)    parts.push(`Tiny win: ${e.tinyWin}`);
+    if (e.tomorrow)   parts.push(`Intention: ${e.tomorrow}`);
+    if ((e.tags||[]).length) parts.push(`Tags: ${e.tags.join(', ')}`);
+    return parts.join(' | ');
+  }).join('\n');
+}
+
+
+function getMoodTone(mood) {
+  const map = {
+    glowing: 'bright and open',
+    peaceful: 'soft and settled',
+    tender: 'sensitive and sincere',
+    heavy: 'tired but still moving',
+    stormy: 'charged and restless',
+    numb: 'quiet and distant',
+    anxious: 'alert and searching',
+    hopeful: 'gently reaching forward'
+  };
+  return map[(mood || '').toLowerCase()] || 'honest and human';
+}
+
+function sentenceJoin(items) {
+  const clean = items.filter(Boolean);
+  if (clean.length === 0) return '';
+  if (clean.length === 1) return clean[0];
+  return clean.slice(0, -1).join(', ') + ' and ' + clean[clean.length - 1];
+}
+
+function getTopItems(map, limit = 3) {
+  return Object.entries(map).sort((a,b) => b[1] - a[1]).slice(0, limit);
+}
+
+
+function getThemeWords(entries, limit = 4) {
+  const stop = new Set(['the','and','for','with','that','this','was','were','are','you','your','but','not','have','had','from','into','about','today','really','just','very','feel','felt','thing','things','little','still','been','will','would','could','should','because','when','then','than','they','them','what','there','their','more','less','some','much','also','like','want','need']);
+  const text = entries.map(e => [e.gratitude, e.hardThing, e.tinyWin, e.tomorrow, ...(e.tags || [])].filter(Boolean).join(' ')).join(' ').toLowerCase();
+  const counts = {};
+  text.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).forEach(word => {
+    if (word.length < 4 || stop.has(word)) return;
+    counts[word] = (counts[word] || 0) + 1;
+  });
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0, limit);
+}
+
+function buildThemeCards(entries) {
+  const safeEntries = entries || [];
+  const moodCounts = {};
+  const tagCounts = {};
+  let totalEnergy = 0;
+
+  safeEntries.forEach(e => {
+    const mood = e.mood || 'reflective';
+    moodCounts[mood] = (moodCounts[mood] || 0) + 1;
+    totalEnergy += Number(e.energy || 3);
+    (e.tags || []).forEach(tag => tagCounts[tag] = (tagCounts[tag] || 0) + 1);
+  });
+
+  const topMood = getTopItems(moodCounts, 1)[0];
+  const topTags = getTopItems(tagCounts, 3);
+  const themeWords = getThemeWords(safeEntries, 3);
+  const avgEnergy = totalEnergy / Math.max(safeEntries.length, 1);
+
+  const cards = [
+    {
+      label: 'emotional center',
+      main: topMood ? topMood[0] : 'forming',
+      sub: topMood ? `${topMood[1]} constellation${topMood[1] === 1 ? '' : 's'} carry this feeling.` : 'Add one entry to begin mapping your center.',
+      width: topMood ? Math.min(100, Math.round((topMood[1] / Math.max(safeEntries.length, 1)) * 100)) : 25
+    },
+    {
+      label: 'recurring symbols',
+      main: topTags.length ? topTags.map(([tag]) => tag).join(' · ') : 'waiting for tags',
+      sub: topTags.length ? 'These are the words your sky keeps returning to.' : 'Tags from future entries will collect here.',
+      width: topTags.length ? Math.min(100, 35 + topTags.length * 20) : 20
+    },
+    {
+      label: 'energy weather',
+      main: avgEnergy >= 3.7 ? 'bright current' : avgEnergy <= 2.4 ? 'quiet current' : 'gentle middle',
+      sub: `Average energy is ${avgEnergy.toFixed(1)} out of 5.`,
+      width: Math.max(15, Math.round((avgEnergy / 5) * 100))
+    },
+    {
+      label: 'Journal themes',
+      main: themeWords.length ? themeWords.map(([word]) => word).join(' · ') : 'soft beginnings',
+      sub: themeWords.length ? 'Pulled from your reflections, wins, gratitudes, and intentions.' : 'Your written reflections will shape this card.',
+      width: themeWords.length ? Math.min(100, 35 + themeWords.length * 18) : 20
+    }
+  ];
+
+  return cards.map(card => `
+    <div class="theme-card">
+      <div class="theme-card-title">${escapeHTML(card.label)}</div>
+      <div class="theme-card-main">${escapeHTML(card.main)}</div>
+      <div class="theme-card-sub">${escapeHTML(card.sub)}</div>
+      <div class="theme-meter" style="--theme-width:${card.width}%"><span></span></div>
+    </div>
+  `).join('');
+}
+
+
+
+function splitInsightIntoBullets(text) {
+  return String(text || '')
+    .replace(/\s+/g, ' ')
+    .split(/(?<=[.!?])\s+/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+function renderInsightBullets(textOrBullets) {
+  const bullets = Array.isArray(textOrBullets) ? textOrBullets : splitInsightIntoBullets(textOrBullets);
+  if (!bullets.length) return '<ul class="insight-bullets"><li>Your patterns are still forming.</li></ul>';
+  return `<ul class="insight-bullets">${bullets.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul>`;
+}
+
+function buildLocalInsight(type, entries) {
+  const recent = entries.slice(0, 12);
+  const moodCounts = {};
+  const tagCounts = {};
+  const dayMood = {};
+  let totalEnergy = 0;
+  let highEnergy = [];
+  let lowEnergy = [];
+  const gratitudes = [];
+  const hardThings = [];
+  const wins = [];
+  const intentions = [];
+
+  recent.forEach(e => {
+    const mood = e.mood || 'unknown';
+    const energy = Number(e.energy || 3);
+    const day = e.dt?.dayOfWeek || e.dayOfWeek || '';
+    moodCounts[mood] = (moodCounts[mood] || 0) + 1;
+    totalEnergy += energy;
+
+    if (energy >= 4) highEnergy.push(mood);
+    if (energy <= 2) lowEnergy.push(mood);
+    if (e.gratitude) gratitudes.push(e.gratitude);
+    if (e.hardThing) hardThings.push(e.hardThing);
+    if (e.tinyWin) wins.push(e.tinyWin);
+    if (e.tomorrow) intentions.push(e.tomorrow);
+    (e.tags || []).forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1);
+
+    if (day) {
+      dayMood[day] = dayMood[day] || {};
+      dayMood[day][mood] = (dayMood[day][mood] || 0) + 1;
+    }
+  });
+
+  const topMood = getTopItems(moodCounts, 1)[0]?.[0] || recent[0]?.mood || 'reflective';
+  const topMoodCount = getTopItems(moodCounts, 1)[0]?.[1] || 1;
+  const avgEnergy = totalEnergy / Math.max(recent.length, 1);
+  const topTags = getTopItems(tagCounts, 3).map(([t]) => t);
+  const topDay = Object.entries(dayMood)
+    .map(([day, moods]) => [day, getTopItems(moods, 1)[0]])
+    .filter(([, item]) => item)
+    .sort((a,b) => b[1][1] - a[1][1])[0];
+
+  if (type === 'weekly') {
+    const dayLine = topDay
+      ? `${topDay[0]} carries the clearest repeating note in your sky, often appearing with a ${getMoodTone(topDay[1][0])} feeling.`
+      : `Your week is still gathering enough stars to form a clear rhythm, but the first outline is beginning to appear.`;
+    const energyLine = avgEnergy >= 3.7
+      ? `Your recent energy sits on the brighter side, suggesting your days have had more movement, spark, or capacity than usual.`
+      : avgEnergy <= 2.4
+        ? `Your recent energy has been low, so this may be a season asking for gentleness, quiet structure, and less pressure.`
+        : `Your energy has been somewhere in the middle, shifting like a thin line between rest and momentum.`;
+    const moodLine = topMoodCount > 1
+      ? `${topMood} has returned more than once, like a star your attention keeps finding again.`
+      : `No single mood is dominating yet, which makes this week feel varied and still unfolding.`;
+    return `${dayLine} ${energyLine} ${moodLine} Let this be information, not a verdict: your rhythm is something you can listen to softly and adjust around.`;
+  }
+
+  if (type === 'patterns') {
+    const themeWords = getThemeWords(recent, 4).map(([word]) => word);
+    const tagsLine = topTags.length
+      ? `The recurring tags around this season are ${sentenceJoin(topTags)}, which may be the smaller stars outlining what your heart keeps circling.`
+      : `Even without many repeated tags yet, your entries are beginning to show what your attention returns to.`;
+    const wordsLine = themeWords.length
+      ? `Your written reflections keep brushing against ${sentenceJoin(themeWords)}, giving this part of your sky a more personal shape.`
+      : `As you write more details, this section will pull clearer themes from your own words.`;
+    const gratitudeLine = gratitudes.length
+      ? `Your gratitudes point toward ${gratitudes[0].toLowerCase()}, a reminder that light is still entering through specific, ordinary places.`
+      : `Your gratitudes are still sparse, so there may be room to name even one small source of steadiness each day.`;
+    const hardLine = hardThings.length
+      ? `The harder moments seem to ask for compassion rather than fixing; they are part of the drawing, not proof that the drawing is broken.`
+      : `There is not a strong pattern of struggle written here yet, which gives the page a spacious, open feeling.`;
+    const winLine = wins.length
+      ? `Your tiny wins matter because they show movement: ${wins[0].toLowerCase()} becomes a small bright mark in the dark.`
+      : `When you begin naming tiny wins, this section will become even more personal and accurate.`;
+    return `${tagsLine} ${wordsLine} ${gratitudeLine} ${hardLine} ${winLine} Across the constellation, the theme is not perfection — it is noticing yourself honestly and still choosing to keep going.`;
+  }
+
+  const moodTone = getMoodTone(topMood);
+  const energyPhrase = avgEnergy >= 3.7
+    ? 'there is a noticeable brightness in your recent energy'
+    : avgEnergy <= 2.4
+      ? 'your recent energy looks tender and low, asking to be held carefully'
+      : 'your recent energy moves in a balanced middle space';
+  const tagsPhrase = topTags.length ? ` The words ${sentenceJoin(topTags)} appear like little compass points, hinting at what has been shaping your days.` : '';
+  const gratitudePhrase = gratitudes.length ? ` What brings you light seems connected to ${gratitudes[0].toLowerCase()}, even if it arrives quietly.` : '';
+  const intentionPhrase = intentions.length ? ` Your next step is already whispering through your intention: ${intentions[0].toLowerCase()}.` : '';
+
+  return `Your sky has been feeling ${moodTone}, with ${topMood} appearing as one of the clearest stars in the pattern. ${energyPhrase}, so your constellation is less about one mood and more about the way you are moving through it.${tagsPhrase}${gratitudePhrase}${intentionPhrase} Nothing here needs to be judged; it is simply a tender map of where you have been, and a soft reminder that even small moments can become light when you take time to notice them.`;
+}
+
+async function generateInsight(type) {
+  if (type === 'themes') type = 'patterns';
+  const entries = loadEntries();
+  if (!entries.length) return;
+
+  const btn = document.getElementById(`btn-${type}`);
+  const textEl = document.getElementById(`ai-${type}-text`);
+  if (!btn || !textEl) return;
+
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = 'reading the stars…';
+  textEl.className = 'ai-response loading';
+  textEl.textContent = 'The stars are gathering your patterns…';
+
+  window.setTimeout(() => {
+    try {
+      const Insight = buildLocalInsight(type, entries);
+      const InsightHTML = renderInsightBullets(Insight);
+      InsightsState[type] = InsightHTML;
+      textEl.className = 'ai-response';
+      textEl.innerHTML = InsightHTML;
+      btn.textContent = originalText.toLowerCase().includes('refresh') ? 'refresh' : 'refresh reading';
+    } catch (err) {
+      textEl.className = 'ai-response';
+      textEl.textContent = 'The Insight section had trouble reading this entry, but your Journal is safe. Try adding one more constellation, then refresh this reading.';
+      btn.textContent = 'try again';
+    } finally {
+      btn.disabled = false;
+    }
+  }, 650);
+}
+
+// ══════════════════════════════════════════════════
+//  ROUTING
+// ══════════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-links button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.getElementById('tab-'+name)?.classList.add('active');
+
+  if (name==='Galaxy') setTimeout(initGalaxy, 60);
+  if (name==='Journal') renderJournal();
+  if (name==='form') { setDateLabel(); setBlurbs(); }
+  if (name==='Insights') renderInsightsPage();
+  window.scrollTo(0,0);
+}
+
+function setDateLabel() {
+  const el=document.getElementById('today-label');
+  if(el) el.textContent=getNow().display;
+}
+
+document.getElementById('auth-email')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') signIn();
+});
+document.getElementById('auth-password')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') signIn();
+});
+
+// INIT
+setDateLabel();
+setBlurbs();
+initAccountSystem();
+</script>
+<script id="immersive-galaxy-upgrade-js">
+(function () {
+  const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function installGalaxyDepth() {
+    const galaxyRoot =
+      document.querySelector('#galaxy') ||
+      document.querySelector('#Galaxy') ||
+      document.querySelector('.Galaxy') ||
+      document.querySelector('.galaxy') ||
+      document.querySelector('[data-section="galaxy"]');
+
+    if (!galaxyRoot || galaxyRoot.dataset.immersiveGalaxy === 'true') return;
+    galaxyRoot.dataset.immersiveGalaxy = 'true';
+
+    const depth = document.createElement('div');
+    depth.className = 'immersive-depth-stars';
+    depth.setAttribute('aria-hidden', 'true');
+    Object.assign(depth.style, {
+      position: 'absolute',
+      inset: '0',
+      pointerEvents: 'none',
+      overflow: 'hidden',
+      zIndex: '0'
+    });
+
+    const layers = [
+      { count: 26, size: [1, 2], opacity: .35, drift: 34 },
+      { count: 18, size: [2, 3], opacity: .42, drift: 24 },
+      { count: 10, size: [3, 5], opacity: .48, drift: 16 }
+    ];
+
+    layers.forEach((layer, layerIndex) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'immersive-depth-layer';
+      Object.assign(wrap.style, {
+        position: 'absolute',
+        inset: '-8%',
+        transform: 'translate3d(0,0,0)',
+        transition: 'transform .35s ease-out'
+      });
+
+      for (let i = 0; i < layer.count; i++) {
+        const star = document.createElement('span');
+        const size = layer.size[0] + Math.random() * (layer.size[1] - layer.size[0]);
+        const kind = i % 7 === 0 ? 'spark' : 'dot';
+        star.className = 'immersive-depth-star ' + kind;
+        Object.assign(star.style, {
+          position: 'absolute',
+          left: (Math.random() * 100) + '%',
+          top: (Math.random() * 100) + '%',
+          width: size + 'px',
+          height: size + 'px',
+          opacity: String(layer.opacity * (.65 + Math.random() * .55)),
+          animationDelay: (Math.random() * 6).toFixed(2) + 's',
+          animationDuration: (4.5 + Math.random() * 5).toFixed(2) + 's'
+        });
+        wrap.appendChild(star);
+      }
+      depth.appendChild(wrap);
+      wrap.dataset.drift = String(layer.drift);
+      wrap.dataset.layer = String(layerIndex);
+    });
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .immersive-depth-star.dot {
+        border-radius: 999px;
+        background: currentColor;
+        color: rgba(34, 28, 24, .66);
+        box-shadow: 0 0 10px rgba(34, 28, 24, .12);
+        animation: immersiveTwinkle ease-in-out infinite;
+      }
+      .immersive-depth-star.spark::before,
+      .immersive-depth-star.spark::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background: rgba(34, 28, 24, .62);
+        transform: translate(-50%, -50%);
+        border-radius: 999px;
+      }
+      .immersive-depth-star.spark::before { width: 1px; height: 14px; }
+      .immersive-depth-star.spark::after { width: 14px; height: 1px; }
+      .immersive-depth-star.spark {
+        animation: immersiveTwinkle ease-in-out infinite;
+      }
+      @keyframes immersiveTwinkle {
+        0%, 100% { transform: scale(.88); opacity: .28; }
+        50% { transform: scale(1.08); opacity: .72; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const firstChild = galaxyRoot.firstElementChild;
+    galaxyRoot.insertBefore(depth, firstChild);
+    Array.from(galaxyRoot.children).forEach(child => {
+      if (child !== depth) {
+        const pos = getComputedStyle(child).position;
+        if (pos === 'static') child.style.position = 'relative';
+        child.style.zIndex = child.style.zIndex || '1';
+      }
+    });
+
+    if (!prefersReducedMotion) {
+      galaxyRoot.addEventListener('mousemove', (e) => {
+        const rect = galaxyRoot.getBoundingClientRect();
+        const nx = ((e.clientX - rect.left) / rect.width) - .5;
+        const ny = ((e.clientY - rect.top) / rect.height) - .5;
+        depth.querySelectorAll('.immersive-depth-layer').forEach(layer => {
+          const drift = Number(layer.dataset.drift || 20);
+          layer.style.transform = `translate3d(${(-nx * drift).toFixed(2)}px, ${(-ny * drift).toFixed(2)}px, 0)`;
+        });
+      });
+      galaxyRoot.addEventListener('mouseleave', () => {
+        depth.querySelectorAll('.immersive-depth-layer').forEach(layer => {
+          layer.style.transform = 'translate3d(0,0,0)';
+        });
+      });
+    }
+  }
+
+  function enhanceCanvasDrawing() {
+    // Upgrade common p5 globals/functions if they exist without replacing app behavior.
+    if (!window.__immersiveGalaxyDrawingPatched && typeof window.drawGalaxyStar === 'function') {
+      const originalStar = window.drawGalaxyStar;
+      window.drawGalaxyStar = function(p, x, y, size, mood, hover) {
+        try {
+          p.push();
+          p.translate(x, y);
+          const glow = hover ? 26 : 13;
+          p.noFill();
+          p.stroke(35, 29, 25, hover ? 72 : 34);
+          p.strokeWeight(.65);
+          p.ellipse(0, 0, size + glow, size + glow * .72);
+          p.stroke(30, 25, 22, hover ? 225 : 165);
+          p.strokeWeight(hover ? 1.45 : 1.05);
+          const points = hover ? 8 : 6;
+          for (let i = 0; i < points; i++) {
+            const a = (Math.PI * 2 / points) * i;
+            const long = size * (i % 2 === 0 ? .7 : .46);
+            const short = size * .16;
+            p.line(Math.cos(a) * short, Math.sin(a) * short, Math.cos(a) * long, Math.sin(a) * long);
+          }
+          p.strokeWeight(.8);
+          p.ellipse(0, 0, Math.max(2, size * .18), Math.max(2, size * .18));
+          p.pop();
+        } catch (err) {
+          originalStar.apply(this, arguments);
+        }
+      };
+      window.__immersiveGalaxyDrawingPatched = true;
+    }
+
+    if (!window.__immersiveGalaxyLinePatched && typeof window.drawGalaxyLine === 'function') {
+      const originalLine = window.drawGalaxyLine;
+      window.drawGalaxyLine = function(p, a, b, softness) {
+        try {
+          p.push();
+          p.noFill();
+          p.stroke(31, 26, 22, 72);
+          p.strokeWeight(.65);
+          const mx = (a.x + b.x) / 2;
+          const my = (a.y + b.y) / 2;
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const len = Math.max(1, Math.hypot(dx, dy));
+          const wobble = Math.min(34, len * .16) * (softness || 1);
+          const cx = mx - (dy / len) * wobble;
+          const cy = my + (dx / len) * wobble;
+          p.bezier(a.x, a.y, cx, cy, cx, cy, b.x, b.y);
+          p.stroke(31, 26, 22, 28);
+          p.strokeWeight(1.8);
+          p.bezier(a.x, a.y, cx + 5, cy - 4, cx - 5, cy + 4, b.x, b.y);
+          p.pop();
+        } catch (err) {
+          originalLine.apply(this, arguments);
+        }
+      };
+      window.__immersiveGalaxyLinePatched = true;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    installGalaxyDepth();
+    enhanceCanvasDrawing();
+    setTimeout(installGalaxyDepth, 500);
+    setTimeout(enhanceCanvasDrawing, 500);
+  });
+  window.addEventListener('load', function () {
+    installGalaxyDepth();
+    enhanceCanvasDrawing();
+  });
+})();
+</script>
+<script id="galaxy-star-visual-helpers">
+function moodGalaxyInk(mood) {
+  const text = String(mood || '').toLowerCase();
+  if (text.includes('happy') || text.includes('joy') || text.includes('excited')) return { r: 42, g: 31, b: 24, a: 210 };
+  if (text.includes('sad') || text.includes('tired') || text.includes('lonely')) return { r: 52, g: 46, b: 44, a: 185 };
+  if (text.includes('angry') || text.includes('stress') || text.includes('anxious')) return { r: 38, g: 29, b: 26, a: 220 };
+  if (text.includes('calm') || text.includes('peace')) return { r: 45, g: 39, b: 35, a: 165 };
+  return { r: 37, g: 31, b: 28, a: 190 };
+}
+
+function drawImmersiveGalaxyStar(p, x, y, size, mood, active) {
+  const ink = moodGalaxyInk(mood);
+  p.push();
+  p.translate(x, y);
+  p.noFill();
+
+  p.stroke(ink.r, ink.g, ink.b, active ? 55 : 24);
+  p.strokeWeight(active ? 1.15 : .7);
+  p.ellipse(0, 0, size * (active ? 2.25 : 1.55), size * (active ? 1.5 : 1.05));
+
+  p.stroke(ink.r, ink.g, ink.b, active ? 235 : ink.a);
+  p.strokeWeight(active ? 1.55 : 1.05);
+  const rays = size > 18 ? 8 : 6;
+  for (let i = 0; i < rays; i++) {
+    const angle = (Math.PI * 2 / rays) * i;
+    const long = size * (i % 2 === 0 ? .72 : .43);
+    const short = size * .12;
+    p.line(Math.cos(angle) * short, Math.sin(angle) * short, Math.cos(angle) * long, Math.sin(angle) * long);
+  }
+
+  p.strokeWeight(.75);
+  p.ellipse(0, 0, Math.max(2.25, size * .16), Math.max(2.25, size * .16));
+
+  if (active) {
+    p.stroke(ink.r, ink.g, ink.b, 70);
+    p.strokeWeight(.8);
+    p.line(0, -size * 1.15, 0, -size * 1.65);
+    p.line(0, size * 1.15, 0, size * 1.55);
+  }
+  p.pop();
+}
+
+function drawImmersiveGalaxyConnection(p, a, b, mood) {
+  const ink = moodGalaxyInk(mood);
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.max(1, Math.hypot(dx, dy));
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const wobble = Math.min(40, len * .18);
+  const cx1 = mx - (dy / len) * wobble;
+  const cy1 = my + (dx / len) * wobble;
+  const cx2 = mx + (dy / len) * wobble * .28;
+  const cy2 = my - (dx / len) * wobble * .28;
+
+  p.push();
+  p.noFill();
+  p.stroke(ink.r, ink.g, ink.b, 58);
+  p.strokeWeight(.75);
+  p.bezier(a.x, a.y, cx1, cy1, cx2, cy2, b.x, b.y);
+  p.stroke(ink.r, ink.g, ink.b, 24);
+  p.strokeWeight(1.8);
+  p.bezier(a.x, a.y, cx1 + 5, cy1 - 3, cx2 - 4, cy2 + 4, b.x, b.y);
+  p.pop();
+}
+</script>
+<script id="safe-galaxy-evolution-reveal-js">
+(function () {
+  function addRevealToPreview() {
+    var targets = [
+      document.querySelector('#constellationPreview'),
+      document.querySelector('.constellation-preview'),
+      document.querySelector('#previewCanvas'),
+      document.querySelector('.preview-canvas'),
+      document.querySelector('.constellation-stage')
+    ].filter(Boolean);
+
+    targets.forEach(function (el) {
+      el.classList.remove('constellation-reveal-active');
+      void el.offsetWidth;
+      el.classList.add('constellation-reveal-active');
+    });
+  }
+
+  function installGalaxyEvolutionLayer() {
+    var galaxy =
+      document.querySelector('#Galaxy') ||
+      document.querySelector('#galaxy') ||
+      document.querySelector('.Galaxy') ||
+      document.querySelector('.galaxy') ||
+      document.querySelector('[data-section="galaxy"]');
+
+    if (!galaxy || galaxy.dataset.safeEvolutionInstalled === 'true') return;
+
+    galaxy.dataset.safeEvolutionInstalled = 'true';
+    if (getComputedStyle(galaxy).position === 'static') {
+      galaxy.style.position = 'relative';
+    }
+    galaxy.style.overflow = galaxy.style.overflow || 'hidden';
+
+    var layer = document.createElement('div');
+    layer.className = 'galaxy-evolution-thread';
+    layer.setAttribute('aria-hidden', 'true');
+    galaxy.insertBefore(layer, galaxy.firstChild);
+  }
+
+  function patchOpenPreviewFunctions() {
+    ['openSavedConstellation', 'showConstellationPreview', 'renderConstellationPreview', 'showEntryPreview'].forEach(function (name) {
+      if (typeof window[name] === 'function' && !window[name].__revealPatched) {
+        var original = window[name];
+        var patched = function () {
+          var result = original.apply(this, arguments);
+          window.setTimeout(addRevealToPreview, 60);
+          return result;
+        };
+        patched.__revealPatched = true;
+        window[name] = patched;
+      }
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var clickable = e.target.closest && e.target.closest(
+      '.Journal-card, .Galaxy-fallback-card, [data-entry-id], [data-constellation-id]'
+    );
+    if (clickable) {
+      window.setTimeout(addRevealToPreview, 80);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    installGalaxyEvolutionLayer();
+    patchOpenPreviewFunctions();
+    window.setTimeout(patchOpenPreviewFunctions, 500);
+    window.setTimeout(installGalaxyEvolutionLayer, 500);
+  });
+
+  window.addEventListener('load', function () {
+    installGalaxyEvolutionLayer();
+    patchOpenPreviewFunctions();
+  });
+})();
+</script><script id="placeholder-galaxy-submissions">
+(function () {
+  const PLACEHOLDER_ENTRIES = [
+  {
+    "id": "placeholder-expanded-1",
+    "date": "2026-03-31",
+    "title": "Calm Constellation",
+    "mood": "Calm",
+    "moods": [
+      "Calm"
+    ],
+    "energy": "High",
+    "theme": "Softness",
+    "journal": "A calm entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of softness and rest.",
+    "note": "Placeholder constellation #1",
+    "insight": [
+      "Your emotional tone leaned toward calm.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Softness",
+      "Rest"
+    ],
+    "constellation": {
+      "seed": 2000,
+      "density": 0.46,
+      "spacing": 0.8,
+      "starCount": 8,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-03-31T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-2",
+    "date": "2026-04-01",
+    "title": "Creative Constellation",
+    "mood": "Creative",
+    "moods": [
+      "Creative"
+    ],
+    "energy": "High",
+    "theme": "Ideas",
+    "journal": "A creative entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of dreams and ideas.",
+    "note": "Placeholder constellation #2",
+    "insight": [
+      "Your emotional tone leaned toward creative.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Dreams",
+      "Ideas"
+    ],
+    "constellation": {
+      "seed": 2097,
+      "density": 0.56,
+      "spacing": 1.13,
+      "starCount": 14,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-01T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-3",
+    "date": "2026-04-02",
+    "title": "Creative Constellation",
+    "mood": "Creative",
+    "moods": [
+      "Creative"
+    ],
+    "energy": "High",
+    "theme": "Ideas",
+    "journal": "A creative entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of dreams and ideas.",
+    "note": "Placeholder constellation #3",
+    "insight": [
+      "Your emotional tone leaned toward creative.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Dreams",
+      "Ideas"
+    ],
+    "constellation": {
+      "seed": 2194,
+      "density": 0.83,
+      "spacing": 0.77,
+      "starCount": 10,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-02T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-4",
+    "date": "2026-04-03",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "High",
+    "theme": "Release",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #4",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 2291,
+      "density": 0.42,
+      "spacing": 0.47,
+      "starCount": 15,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-03T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-5",
+    "date": "2026-04-04",
+    "title": "Hopeful Constellation",
+    "mood": "Hopeful",
+    "moods": [
+      "Hopeful"
+    ],
+    "energy": "Low",
+    "theme": "Light",
+    "journal": "A hopeful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of future and light.",
+    "note": "Placeholder constellation #5",
+    "insight": [
+      "Your emotional tone leaned toward hopeful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Future",
+      "Light"
+    ],
+    "constellation": {
+      "seed": 2388,
+      "density": 0.85,
+      "spacing": 0.94,
+      "starCount": 12,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-04T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-6",
+    "date": "2026-04-05",
+    "title": "Hopeful Constellation",
+    "mood": "Hopeful",
+    "moods": [
+      "Hopeful"
+    ],
+    "energy": "High",
+    "theme": "Future",
+    "journal": "A hopeful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of future and light.",
+    "note": "Placeholder constellation #6",
+    "insight": [
+      "Your emotional tone leaned toward hopeful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Future",
+      "Light"
+    ],
+    "constellation": {
+      "seed": 2485,
+      "density": 0.61,
+      "spacing": 0.57,
+      "starCount": 6,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-05T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-7",
+    "date": "2026-04-06",
+    "title": "Calm Constellation",
+    "mood": "Calm",
+    "moods": [
+      "Calm"
+    ],
+    "energy": "High",
+    "theme": "Softness",
+    "journal": "A calm entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of softness and rest.",
+    "note": "Placeholder constellation #7",
+    "insight": [
+      "Your emotional tone leaned toward calm.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Softness",
+      "Rest"
+    ],
+    "constellation": {
+      "seed": 2582,
+      "density": 0.49,
+      "spacing": 0.46,
+      "starCount": 15,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-06T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-8",
+    "date": "2026-04-07",
+    "title": "Calm Constellation",
+    "mood": "Calm",
+    "moods": [
+      "Calm"
+    ],
+    "energy": "High",
+    "theme": "Rest",
+    "journal": "A calm entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of softness and rest.",
+    "note": "Placeholder constellation #8",
+    "insight": [
+      "Your emotional tone leaned toward calm.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Softness",
+      "Rest"
+    ],
+    "constellation": {
+      "seed": 2679,
+      "density": 0.52,
+      "spacing": 0.46,
+      "starCount": 15,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-07T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-9",
+    "date": "2026-04-08",
+    "title": "Peaceful Constellation",
+    "mood": "Peaceful",
+    "moods": [
+      "Peaceful"
+    ],
+    "energy": "High",
+    "theme": "Stillness",
+    "journal": "A peaceful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of stillness and balance.",
+    "note": "Placeholder constellation #9",
+    "insight": [
+      "Your emotional tone leaned toward peaceful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Stillness",
+      "Balance"
+    ],
+    "constellation": {
+      "seed": 2776,
+      "density": 0.97,
+      "spacing": 1.11,
+      "starCount": 16,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-08T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-10",
+    "date": "2026-04-09",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "High",
+    "theme": "Tension",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #10",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 2873,
+      "density": 0.74,
+      "spacing": 0.68,
+      "starCount": 6,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-09T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-11",
+    "date": "2026-04-10",
+    "title": "Reflective Constellation",
+    "mood": "Reflective",
+    "moods": [
+      "Reflective"
+    ],
+    "energy": "Medium",
+    "theme": "Memory",
+    "journal": "A reflective entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of growth and memory.",
+    "note": "Placeholder constellation #11",
+    "insight": [
+      "Your emotional tone leaned toward reflective.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Growth",
+      "Memory"
+    ],
+    "constellation": {
+      "seed": 2970,
+      "density": 0.54,
+      "spacing": 0.98,
+      "starCount": 11,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-10T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-12",
+    "date": "2026-04-11",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "Low",
+    "theme": "Tension",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #12",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 3067,
+      "density": 0.49,
+      "spacing": 0.54,
+      "starCount": 6,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-11T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-13",
+    "date": "2026-04-12",
+    "title": "Hopeful Constellation",
+    "mood": "Hopeful",
+    "moods": [
+      "Hopeful"
+    ],
+    "energy": "Medium",
+    "theme": "Light",
+    "journal": "A hopeful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of future and light.",
+    "note": "Placeholder constellation #13",
+    "insight": [
+      "Your emotional tone leaned toward hopeful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Future",
+      "Light"
+    ],
+    "constellation": {
+      "seed": 3164,
+      "density": 0.57,
+      "spacing": 0.56,
+      "starCount": 10,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-12T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-14",
+    "date": "2026-04-13",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "Low",
+    "theme": "Tension",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #14",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 3261,
+      "density": 0.62,
+      "spacing": 0.7,
+      "starCount": 6,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-13T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-15",
+    "date": "2026-04-14",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "High",
+    "theme": "Release",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #15",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 3358,
+      "density": 0.8,
+      "spacing": 1.04,
+      "starCount": 12,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-14T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-16",
+    "date": "2026-04-15",
+    "title": "Calm Constellation",
+    "mood": "Calm",
+    "moods": [
+      "Calm"
+    ],
+    "energy": "High",
+    "theme": "Rest",
+    "journal": "A calm entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of softness and rest.",
+    "note": "Placeholder constellation #16",
+    "insight": [
+      "Your emotional tone leaned toward calm.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Softness",
+      "Rest"
+    ],
+    "constellation": {
+      "seed": 3455,
+      "density": 0.98,
+      "spacing": 0.79,
+      "starCount": 8,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-15T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-17",
+    "date": "2026-04-16",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "Medium",
+    "theme": "Tension",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #17",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 3552,
+      "density": 0.57,
+      "spacing": 1.07,
+      "starCount": 14,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-16T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-18",
+    "date": "2026-04-17",
+    "title": "Creative Constellation",
+    "mood": "Creative",
+    "moods": [
+      "Creative"
+    ],
+    "energy": "Low",
+    "theme": "Dreams",
+    "journal": "A creative entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of dreams and ideas.",
+    "note": "Placeholder constellation #18",
+    "insight": [
+      "Your emotional tone leaned toward creative.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Dreams",
+      "Ideas"
+    ],
+    "constellation": {
+      "seed": 3649,
+      "density": 0.68,
+      "spacing": 0.88,
+      "starCount": 14,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-17T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-19",
+    "date": "2026-04-18",
+    "title": "Creative Constellation",
+    "mood": "Creative",
+    "moods": [
+      "Creative"
+    ],
+    "energy": "Low",
+    "theme": "Ideas",
+    "journal": "A creative entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of dreams and ideas.",
+    "note": "Placeholder constellation #19",
+    "insight": [
+      "Your emotional tone leaned toward creative.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Dreams",
+      "Ideas"
+    ],
+    "constellation": {
+      "seed": 3746,
+      "density": 1.0,
+      "spacing": 0.59,
+      "starCount": 14,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-18T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-20",
+    "date": "2026-04-19",
+    "title": "Joyful Constellation",
+    "mood": "Joyful",
+    "moods": [
+      "Joyful"
+    ],
+    "energy": "Medium",
+    "theme": "Wonder",
+    "journal": "A joyful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of connection and wonder.",
+    "note": "Placeholder constellation #20",
+    "insight": [
+      "Your emotional tone leaned toward joyful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Connection",
+      "Wonder"
+    ],
+    "constellation": {
+      "seed": 3843,
+      "density": 0.76,
+      "spacing": 0.65,
+      "starCount": 15,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-19T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-21",
+    "date": "2026-04-20",
+    "title": "Peaceful Constellation",
+    "mood": "Peaceful",
+    "moods": [
+      "Peaceful"
+    ],
+    "energy": "Low",
+    "theme": "Balance",
+    "journal": "A peaceful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of stillness and balance.",
+    "note": "Placeholder constellation #21",
+    "insight": [
+      "Your emotional tone leaned toward peaceful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Stillness",
+      "Balance"
+    ],
+    "constellation": {
+      "seed": 3940,
+      "density": 0.6,
+      "spacing": 0.89,
+      "starCount": 7,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-20T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-22",
+    "date": "2026-04-21",
+    "title": "Peaceful Constellation",
+    "mood": "Peaceful",
+    "moods": [
+      "Peaceful"
+    ],
+    "energy": "Medium",
+    "theme": "Stillness",
+    "journal": "A peaceful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of stillness and balance.",
+    "note": "Placeholder constellation #22",
+    "insight": [
+      "Your emotional tone leaned toward peaceful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Stillness",
+      "Balance"
+    ],
+    "constellation": {
+      "seed": 4037,
+      "density": 0.53,
+      "spacing": 0.63,
+      "starCount": 12,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-21T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-23",
+    "date": "2026-04-22",
+    "title": "Joyful Constellation",
+    "mood": "Joyful",
+    "moods": [
+      "Joyful"
+    ],
+    "energy": "Low",
+    "theme": "Connection",
+    "journal": "A joyful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of connection and wonder.",
+    "note": "Placeholder constellation #23",
+    "insight": [
+      "Your emotional tone leaned toward joyful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Connection",
+      "Wonder"
+    ],
+    "constellation": {
+      "seed": 4134,
+      "density": 0.52,
+      "spacing": 0.48,
+      "starCount": 14,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-22T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-24",
+    "date": "2026-04-23",
+    "title": "Reflective Constellation",
+    "mood": "Reflective",
+    "moods": [
+      "Reflective"
+    ],
+    "energy": "High",
+    "theme": "Memory",
+    "journal": "A reflective entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of growth and memory.",
+    "note": "Placeholder constellation #24",
+    "insight": [
+      "Your emotional tone leaned toward reflective.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Growth",
+      "Memory"
+    ],
+    "constellation": {
+      "seed": 4231,
+      "density": 0.51,
+      "spacing": 0.86,
+      "starCount": 9,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-23T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-25",
+    "date": "2026-04-24",
+    "title": "Hopeful Constellation",
+    "mood": "Hopeful",
+    "moods": [
+      "Hopeful"
+    ],
+    "energy": "Low",
+    "theme": "Light",
+    "journal": "A hopeful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of future and light.",
+    "note": "Placeholder constellation #25",
+    "insight": [
+      "Your emotional tone leaned toward hopeful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Future",
+      "Light"
+    ],
+    "constellation": {
+      "seed": 4328,
+      "density": 0.76,
+      "spacing": 0.83,
+      "starCount": 6,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-24T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-26",
+    "date": "2026-04-25",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "Medium",
+    "theme": "Tension",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #26",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 4425,
+      "density": 0.46,
+      "spacing": 1.13,
+      "starCount": 7,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-25T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-27",
+    "date": "2026-04-26",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "Low",
+    "theme": "Release",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #27",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 4522,
+      "density": 0.99,
+      "spacing": 0.59,
+      "starCount": 13,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-26T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-28",
+    "date": "2026-04-27",
+    "title": "Creative Constellation",
+    "mood": "Creative",
+    "moods": [
+      "Creative"
+    ],
+    "energy": "Medium",
+    "theme": "Dreams",
+    "journal": "A creative entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of dreams and ideas.",
+    "note": "Placeholder constellation #28",
+    "insight": [
+      "Your emotional tone leaned toward creative.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Dreams",
+      "Ideas"
+    ],
+    "constellation": {
+      "seed": 4619,
+      "density": 0.69,
+      "spacing": 0.59,
+      "starCount": 6,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-27T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-29",
+    "date": "2026-04-28",
+    "title": "Calm Constellation",
+    "mood": "Calm",
+    "moods": [
+      "Calm"
+    ],
+    "energy": "Medium",
+    "theme": "Softness",
+    "journal": "A calm entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of softness and rest.",
+    "note": "Placeholder constellation #29",
+    "insight": [
+      "Your emotional tone leaned toward calm.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Softness",
+      "Rest"
+    ],
+    "constellation": {
+      "seed": 4716,
+      "density": 0.44,
+      "spacing": 0.73,
+      "starCount": 15,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-28T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-30",
+    "date": "2026-04-29",
+    "title": "Creative Constellation",
+    "mood": "Creative",
+    "moods": [
+      "Creative"
+    ],
+    "energy": "Medium",
+    "theme": "Dreams",
+    "journal": "A creative entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of dreams and ideas.",
+    "note": "Placeholder constellation #30",
+    "insight": [
+      "Your emotional tone leaned toward creative.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Dreams",
+      "Ideas"
+    ],
+    "constellation": {
+      "seed": 4813,
+      "density": 0.59,
+      "spacing": 0.58,
+      "starCount": 8,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-29T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-31",
+    "date": "2026-04-30",
+    "title": "Peaceful Constellation",
+    "mood": "Peaceful",
+    "moods": [
+      "Peaceful"
+    ],
+    "energy": "Medium",
+    "theme": "Stillness",
+    "journal": "A peaceful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of stillness and balance.",
+    "note": "Placeholder constellation #31",
+    "insight": [
+      "Your emotional tone leaned toward peaceful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Stillness",
+      "Balance"
+    ],
+    "constellation": {
+      "seed": 4910,
+      "density": 0.75,
+      "spacing": 0.93,
+      "starCount": 12,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-04-30T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-32",
+    "date": "2026-05-01",
+    "title": "Reflective Constellation",
+    "mood": "Reflective",
+    "moods": [
+      "Reflective"
+    ],
+    "energy": "Medium",
+    "theme": "Growth",
+    "journal": "A reflective entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of growth and memory.",
+    "note": "Placeholder constellation #32",
+    "insight": [
+      "Your emotional tone leaned toward reflective.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Growth",
+      "Memory"
+    ],
+    "constellation": {
+      "seed": 5007,
+      "density": 0.71,
+      "spacing": 1.2,
+      "starCount": 6,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-05-01T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-33",
+    "date": "2026-05-02",
+    "title": "Peaceful Constellation",
+    "mood": "Peaceful",
+    "moods": [
+      "Peaceful"
+    ],
+    "energy": "High",
+    "theme": "Balance",
+    "journal": "A peaceful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of stillness and balance.",
+    "note": "Placeholder constellation #33",
+    "insight": [
+      "Your emotional tone leaned toward peaceful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Stillness",
+      "Balance"
+    ],
+    "constellation": {
+      "seed": 5104,
+      "density": 0.65,
+      "spacing": 0.58,
+      "starCount": 10,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-05-02T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-34",
+    "date": "2026-05-03",
+    "title": "Reflective Constellation",
+    "mood": "Reflective",
+    "moods": [
+      "Reflective"
+    ],
+    "energy": "Medium",
+    "theme": "Growth",
+    "journal": "A reflective entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of growth and memory.",
+    "note": "Placeholder constellation #34",
+    "insight": [
+      "Your emotional tone leaned toward reflective.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Growth",
+      "Memory"
+    ],
+    "constellation": {
+      "seed": 5201,
+      "density": 0.4,
+      "spacing": 0.6,
+      "starCount": 13,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-05-03T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-35",
+    "date": "2026-05-04",
+    "title": "Anxious Constellation",
+    "mood": "Anxious",
+    "moods": [
+      "Anxious"
+    ],
+    "energy": "Low",
+    "theme": "Release",
+    "journal": "A anxious entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of tension and release.",
+    "note": "Placeholder constellation #35",
+    "insight": [
+      "Your emotional tone leaned toward anxious.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Tension",
+      "Release"
+    ],
+    "constellation": {
+      "seed": 5298,
+      "density": 0.81,
+      "spacing": 0.68,
+      "starCount": 11,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-05-04T21:00:00.000Z"
+  },
+  {
+    "id": "placeholder-expanded-36",
+    "date": "2026-05-05",
+    "title": "Peaceful Constellation",
+    "mood": "Peaceful",
+    "moods": [
+      "Peaceful"
+    ],
+    "energy": "High",
+    "theme": "Balance",
+    "journal": "A peaceful entry drifting through the galaxy.",
+    "reflection": "This constellation carries themes of stillness and balance.",
+    "note": "Placeholder constellation #36",
+    "insight": [
+      "Your emotional tone leaned toward peaceful.",
+      "Patterns in spacing and star density shape the constellation.",
+      "This entry contributes to the evolving emotional galaxy."
+    ],
+    "themes": [
+      "Stillness",
+      "Balance"
+    ],
+    "constellation": {
+      "seed": 5395,
+      "density": 0.56,
+      "spacing": 1.01,
+      "starCount": 16,
+      "lineStyle": "soft-sketch"
+    },
+    "isPlaceholder": true,
+    "createdAt": "2026-05-05T21:00:00.000Z"
+  }
+];
+
+  function readJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function writeJSON(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {}
+  }
+
+  function mergePlaceholders(key) {
+    const existing = readJSON(key, []);
+    if (!Array.isArray(existing)) return;
+    const realEntries = existing.filter(entry => !entry || entry.isPlaceholder !== true);
+    const merged = [...realEntries, ...PLACEHOLDER_ENTRIES];
+    writeJSON(key, merged);
+  }
+
+  function seedPlaceholders() {
+    const possibleKeys = [
+      'constellationEntries',
+      'entries',
+      'journalEntries',
+      'savedConstellations',
+      'moodConstellations',
+      'constellationJournal',
+      'moodEntries'
+    ];
+
+    possibleKeys.forEach(mergePlaceholders);
+
+    // Also support account/email-scoped local saves.
+    try {
+      const currentEmail =
+        localStorage.getItem('currentUserEmail') ||
+        localStorage.getItem('currentEmail') ||
+        localStorage.getItem('userEmail') ||
+        'demo@example.com';
+
+      [
+        `constellationEntries:${currentEmail}`,
+        `entries:${currentEmail}`,
+        `journalEntries:${currentEmail}`,
+        `savedConstellations:${currentEmail}`,
+        `moodConstellations:${currentEmail}`
+      ].forEach(mergePlaceholders);
+    } catch (e) {}
+
+    localStorage.setItem('hasPlaceholderGalaxySubmissions', 'true');
+  }
+
+  seedPlaceholders();
+
+  window.clearPlaceholderGalaxySubmissions = function () {
+    Object.keys(localStorage).forEach(key => {
+      const value = readJSON(key, null);
+      if (Array.isArray(value)) {
+        writeJSON(key, value.filter(entry => !entry || entry.isPlaceholder !== true));
+      }
+    });
+    localStorage.removeItem('hasPlaceholderGalaxySubmissions');
+    location.reload();
+  };
+
+  window.addEventListener('load', function () {
+    if (typeof renderGalaxy === 'function') renderGalaxy();
+    if (typeof renderJournal === 'function') renderJournal();
+    if (typeof loadEntries === 'function') loadEntries();
+  });
+})();
+</script></body>
+</html>
